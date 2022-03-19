@@ -48,4 +48,11 @@ public class ChessPiece : MonoBehaviour
             yield return null;
         }
     }
+
+    public virtual void MoveTo(Vector2Int targetPosition)
+    {
+        currentX = targetPosition.x;
+        currentY = targetPosition.y;
+        transform.position = new Vector3(currentX, transform.position.y, currentY);
+    }
 }

@@ -21,20 +21,37 @@ public class ChessBoard : MonoBehaviour
     [SerializeField] private List<GameObject> prefabs;
     [SerializeField] private List<Material> teamMaterials;
 
+    // For logics
     private ChessPiece[,] chessPieces;
+    private ChessPiece currentSelectedPiece;
+
+    // Player Turn
+    private Team currentTurn;
+    private Team playerTeam;
+    private Team otherTeam;
+
+    // For generateAllTiles
     private const int TILE_COUNT_X = 8;
     private const int TILE_COUNT_Y = 8;
     private GameObject[,] tiles;
     private Camera currentCamera;
     private Vector2Int currentHover;
     private Vector3 bounds;
+
+    // For events
     private ChessBoardInputEvent chessBoardInputEvent;
 
     private void Awake()
     {
         chessBoardInputEvent = GetComponent<ChessBoardInputEvent>();
-
         registerInputEvent(true);
+
+        currentTurn = Team.Blue;
+        playerTeam = Team.Blue;
+        otherTeam = Team.Red;
+
+        currentSelectedPiece = null;
+
         GenerateAllTiles(tileSize, TILE_COUNT_X, TILE_COUNT_Y);
         SpawnAllPieces();
         PositionAllPieces();
@@ -91,26 +108,106 @@ public class ChessBoard : MonoBehaviour
         // If player click out of the board, cancel the move
         if (currentHover == -Vector2Int.one)
         {
-            Debug.Log("Cancel");
+            if (currentSelectedPiece != null)
+                currentSelectedPiece.Select();
+            currentSelectedPiece = null;
             return;
         }
 
         // If this is our turn
         if (true)
         {
+            // If that position has a valid chess piece then selected
             if (chessPieces[currentHover.x, currentHover.y] != null)
+            {
                 chessPieces[currentHover.x, currentHover.y].Select();
+                currentSelectedPiece = chessPieces[currentHover.x, currentHover.y];
+            }
         }
     }
+
+    private void OnLeftMouseButtonDown1()
+    {
+        // If this is not our turn
+        if (currentTurn != playerTeam) return;
+
+        // If the select outside of the board
+        if (currentHover == -Vector2Int.one)
+        {
+            // If currentSelectedPiece is selected
+            if (currentSelectedPiece != null)
+                currentSelectedPiece.Select();
+
+            currentSelectedPiece = null;
+
+            return;
+        }
+
+        if (chessPieces[currentHover.x, currentHover.y] == null)
+        {
+            // If currentSelectedPiece is selected
+            if (currentSelectedPiece != null)
+            {
+                currentSelectedPiece.MoveTo(currentHover);
+                currentSelectedPiece.Select();
+                currentSelectedPiece = null;
+            }
+        }
+        else
+        {
+            // If chess at currentHover is not our piece
+            if (chessPieces[currentHover.x, currentHover.y].team != playerTeam)
+            {
+                if (currentSelectedPiece == null) return;
+
+                if (CanCurrentSelectedPieceMoveHere(currentHover))
+                {
+                    ReplaceThisPieceWithCurrentSelectedPiece(chessPieces[currentHover.x, currentHover.y]);
+                    Debug.Log($"{currentSelectedPiece.pieceType.ToString()} killed {chessPieces[currentHover.x, currentHover.y].pieceType.ToString()}");
+
+                    currentSelectedPiece = null;
+                    return;
+                }
+
+                Debug.Log($"{currentSelectedPiece.pieceType.ToString()} Cannot kill {chessPieces[currentHover.x, currentHover.y].pieceType.ToString()}");
+            }
+            else
+            {
+                if (currentSelectedPiece != null)
+                {
+                    currentSelectedPiece.Select();
+                    currentSelectedPiece = null;
+                }
+                else
+                {
+                    currentSelectedPiece = chessPieces[currentHover.x, currentHover.y];
+                    currentSelectedPiece.Select();
+                }
+                return;
+            }
+        }
+    }
+
+    private void ReplaceThisPieceWithCurrentSelectedPiece(ChessPiece thisPiece)
+    {
+        // replace the current hover piece with the current selected piece
+        thisPiece = currentSelectedPiece; // sai
+    }
+
+    private bool CanCurrentSelectedPieceMoveHere(Vector2Int currentHover)
+    {
+        return true;
+    }
+
     private void registerInputEvent(bool comfirm)
     {
         if (comfirm)
         {
-            chessBoardInputEvent.onLeftMouseButtonDown += OnLeftMouseButtonDown;
+            chessBoardInputEvent.onLeftMouseButtonDown += OnLeftMouseButtonDown1;
         }
         else
         {
-            chessBoardInputEvent.onLeftMouseButtonDown -= OnLeftMouseButtonDown;
+            chessBoardInputEvent.onLeftMouseButtonDown -= OnLeftMouseButtonDown1;
         }
     }
 
