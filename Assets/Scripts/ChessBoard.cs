@@ -28,10 +28,13 @@ public class ChessBoard : MonoBehaviour
     private Camera currentCamera;
     private Vector2Int currentHover;
     private Vector3 bounds;
-
+    private ChessBoardInputEvent chessBoardInputEvent;
 
     private void Awake()
     {
+        chessBoardInputEvent = GetComponent<ChessBoardInputEvent>();
+
+        registerInputEvent(true);
         GenerateAllTiles(tileSize, TILE_COUNT_X, TILE_COUNT_Y);
         SpawnAllPieces();
         PositionAllPieces();
@@ -74,6 +77,40 @@ public class ChessBoard : MonoBehaviour
                 tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer("Tile");
                 currentHover = -Vector2Int.one;
             }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        registerInputEvent(false);
+    }
+
+    // Input event handler
+    private void OnLeftMouseButtonDown()
+    {
+        // If player click out of the board, cancel the move
+        if (currentHover == -Vector2Int.one)
+        {
+            Debug.Log("Cancel");
+            return;
+        }
+
+        // If this is our turn
+        if (true)
+        {
+            if (chessPieces[currentHover.x, currentHover.y] != null)
+                chessPieces[currentHover.x, currentHover.y].Select();
+        }
+    }
+    private void registerInputEvent(bool comfirm)
+    {
+        if (comfirm)
+        {
+            chessBoardInputEvent.onLeftMouseButtonDown += OnLeftMouseButtonDown;
+        }
+        else
+        {
+            chessBoardInputEvent.onLeftMouseButtonDown -= OnLeftMouseButtonDown;
         }
     }
 
