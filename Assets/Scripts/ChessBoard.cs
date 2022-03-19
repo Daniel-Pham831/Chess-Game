@@ -24,11 +24,12 @@ public class ChessBoard : MonoBehaviour
     // For logics
     private ChessPiece[,] chessPieces;
     private ChessPiece currentSelectedPiece;
+    private DeadList deadList;
 
     // Player Turn
-    private Team currentTurn;
-    private Team playerTeam;
-    private Team otherTeam;
+    public Team currentTurn;
+    public Team playerTeam;
+    public Team otherTeam;
 
     // For generateAllTiles
     private const int TILE_COUNT_X = 8;
@@ -52,9 +53,11 @@ public class ChessBoard : MonoBehaviour
 
         currentSelectedPiece = null;
 
+
         GenerateAllTiles(tileSize, TILE_COUNT_X, TILE_COUNT_Y);
         SpawnAllPieces();
         PositionAllPieces();
+        deadList = new DeadList(GetTileCenter(8, -1), GetTileCenter(-1, 8), tileSize, transform.forward);
     }
 
     private void Update()
@@ -105,29 +108,6 @@ public class ChessBoard : MonoBehaviour
     // Input event handler
     private void OnLeftMouseButtonDown()
     {
-        // If player click out of the board, cancel the move
-        if (currentHover == -Vector2Int.one)
-        {
-            if (currentSelectedPiece != null)
-                currentSelectedPiece.Select();
-            currentSelectedPiece = null;
-            return;
-        }
-
-        // If this is our turn
-        if (true)
-        {
-            // If that position has a valid chess piece then selected
-            if (chessPieces[currentHover.x, currentHover.y] != null)
-            {
-                chessPieces[currentHover.x, currentHover.y].Select();
-                currentSelectedPiece = chessPieces[currentHover.x, currentHover.y];
-            }
-        }
-    }
-
-    private void OnLeftMouseButtonDown1()
-    {
         // If this is not our turn
         if (currentTurn != playerTeam) return;
 
@@ -148,28 +128,25 @@ public class ChessBoard : MonoBehaviour
             // If currentSelectedPiece is selected
             if (currentSelectedPiece != null)
             {
-                currentSelectedPiece.MoveTo(currentHover);
-                currentSelectedPiece.Select();
-                currentSelectedPiece = null;
+                ReplaceHoverPieceWithCurrentSelectedPiece();
             }
         }
         else
         {
-            // If chess at currentHover is not our piece
+            // If chessPiece at currentHover is not our piece
             if (chessPieces[currentHover.x, currentHover.y].team != playerTeam)
             {
                 if (currentSelectedPiece == null) return;
 
                 if (CanCurrentSelectedPieceMoveHere(currentHover))
                 {
-                    ReplaceThisPieceWithCurrentSelectedPiece(chessPieces[currentHover.x, currentHover.y]);
                     Debug.Log($"{currentSelectedPiece.pieceType.ToString()} killed {chessPieces[currentHover.x, currentHover.y].pieceType.ToString()}");
+                    ReplaceHoverPieceWithCurrentSelectedPiece(true);
 
-                    currentSelectedPiece = null;
                     return;
                 }
-
-                Debug.Log($"{currentSelectedPiece.pieceType.ToString()} Cannot kill {chessPieces[currentHover.x, currentHover.y].pieceType.ToString()}");
+                else
+                    Debug.Log($"{currentSelectedPiece.pieceType.ToString()} Cannot kill {chessPieces[currentHover.x, currentHover.y].pieceType.ToString()}");
             }
             else
             {
@@ -183,15 +160,30 @@ public class ChessBoard : MonoBehaviour
                     currentSelectedPiece = chessPieces[currentHover.x, currentHover.y];
                     currentSelectedPiece.Select();
                 }
-                return;
             }
         }
     }
 
-    private void ReplaceThisPieceWithCurrentSelectedPiece(ChessPiece thisPiece)
+    private void ReplaceHoverPieceWithCurrentSelectedPiece(bool killConfirm = false)
     {
-        // replace the current hover piece with the current selected piece
-        thisPiece = currentSelectedPiece; // sai
+        ChessPiece tempChessPiece = currentSelectedPiece;
+        ChessPiece deadPiece = killConfirm ? chessPieces[currentHover.x, currentHover.y] : null;
+
+        chessPieces[currentHover.x, currentHover.y] = currentSelectedPiece;
+        chessPieces[tempChessPiece.currentX, tempChessPiece.currentY] = null;
+
+        currentSelectedPiece.Select();
+        currentSelectedPiece = null;
+
+        PositionASinglePiece(currentHover.x, currentHover.y, true);
+        MoveDeadPieceToDeadList(deadPiece);
+    }
+
+    private void MoveDeadPieceToDeadList(ChessPiece deadPiece)
+    {
+        if (deadPiece == null) return;
+
+        deadList.AddPieceToDeadList(deadPiece);
     }
 
     private bool CanCurrentSelectedPieceMoveHere(Vector2Int currentHover)
@@ -199,15 +191,15 @@ public class ChessBoard : MonoBehaviour
         return true;
     }
 
-    private void registerInputEvent(bool comfirm)
+    private void registerInputEvent(bool confirm)
     {
-        if (comfirm)
+        if (confirm)
         {
-            chessBoardInputEvent.onLeftMouseButtonDown += OnLeftMouseButtonDown1;
+            chessBoardInputEvent.onLeftMouseButtonDown += OnLeftMouseButtonDown;
         }
         else
         {
-            chessBoardInputEvent.onLeftMouseButtonDown -= OnLeftMouseButtonDown1;
+            chessBoardInputEvent.onLeftMouseButtonDown -= OnLeftMouseButtonDown;
         }
     }
 
