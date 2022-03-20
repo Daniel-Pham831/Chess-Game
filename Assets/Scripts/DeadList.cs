@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class DeadList : MonoBehaviour
 {
-    [SerializeField] private int smoothTime = 50;
+    private int smoothTime;
     private List<ChessPiece> blueDeadList;
     private List<ChessPiece> redDeadList;
 
@@ -17,6 +17,11 @@ public class DeadList : MonoBehaviour
 
     private Vector3 bluePieceForward;
     private Vector3 redPieceForward;
+
+    private void Start()
+    {
+        smoothTime = ChessBoardConfiguration.Singleton.smoothTime;
+    }
 
     public void SetupDeadList(Vector3 blueDeadListPosition, Vector3 redDeadListPosition, float tileSize, Vector3 chessBoardForward)
     {

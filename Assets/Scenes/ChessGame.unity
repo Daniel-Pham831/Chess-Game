@@ -369,8 +369,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileMaterial: {fileID: 2100000, guid: 6f57284b0fc68c641a7427a76cd5437e, type: 2}
-  tileSize: 1
-  yOffset: 0.5
   boardCenter: {x: 0, y: 0, z: 0}
   prefabs:
   - {fileID: 1584305380508448676, guid: 95fe567ab18cd4941ade689cd7e62f64, type: 3}
@@ -382,7 +380,6 @@ MonoBehaviour:
   teamMaterials:
   - {fileID: 2100000, guid: d055784c1de04ae4984c52fc05bbf2c9, type: 2}
   - {fileID: 2100000, guid: b208f066afc0e914493768ec3856c452, type: 2}
-  smoothTime: 35
 --- !u!4 &543450652230101980
 Transform:
   m_ObjectHideFlags: 0
@@ -409,6 +406,7 @@ GameObject:
   - component: {fileID: 543450652230101980}
   - component: {fileID: 3469287838161183865}
   - component: {fileID: 1711813854435922099}
+  - component: {fileID: 3469287838161183868}
   - component: {fileID: 1994052980}
   - component: {fileID: 3469287838161183866}
   - component: {fileID: 3469287838161183867}
@@ -493,4 +491,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcd3400111499ae438d58555e73af2dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &3469287838161183868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132148509798758}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 399f76b4c1fcc9441a1915080eacbc83, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   smoothTime: 35
+  tileSize: 1
+  yOffset: 0.525

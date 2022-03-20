@@ -13,21 +13,17 @@ public class ChessBoard : MonoBehaviour
 {
     [Header("Art Section")]
     [SerializeField] private Material tileMaterial;
-    [SerializeField] private float tileSize = 1f;
-    [SerializeField] private float yOffset = 0.2f;
     [SerializeField] private Vector3 boardCenter = Vector3.zero;
 
     [Header("Prefabs & Materials")]
     [SerializeField] private List<GameObject> prefabs;
     [SerializeField] private List<Material> teamMaterials;
 
-    [Header("Chess Movement")]
-    [SerializeField] private int smoothTime = 25;
-
     // For logics
-    private ChessPiece[,] chessPieces;
+    public ChessPiece[,] chessPieces;
     private ChessPiece currentSelectedPiece;
     private DeadList deadList;
+    private int smoothTime;
 
     // Player Turn
     private Team currentTurn;
@@ -35,8 +31,10 @@ public class ChessBoard : MonoBehaviour
     private Team otherTeam;
 
     // For generateAllTiles
-    private const int TILE_COUNT_X = 8;
-    private const int TILE_COUNT_Y = 8;
+    private float tileSize;
+    private float yOffset;
+    private int TILE_COUNT_X;
+    private int TILE_COUNT_Y;
     private GameObject[,] tiles;
     private Camera currentCamera;
     private Vector2Int currentHover;
@@ -45,8 +43,15 @@ public class ChessBoard : MonoBehaviour
     // For events
     private ChessBoardInputEvent chessBoardInputEvent;
 
+    // For singleton
+    public static ChessBoard Singleton { get; private set; }
+
+    private ChessBoardConfiguration chessBoardConfiguration;
+
     private void Awake()
     {
+        SetupSingleton();
+
         chessBoardInputEvent = GetComponent<ChessBoardInputEvent>();
         registerInputEvent(true);
 
@@ -57,15 +62,35 @@ public class ChessBoard : MonoBehaviour
         currentSelectedPiece = null;
         deadList = GetComponent<DeadList>();
 
+        chessBoardConfiguration = ChessBoardConfiguration.Singleton;
+    }
+
+    private void Start()
+    {
+        InitializeValues();
 
         GenerateAllTiles(tileSize, TILE_COUNT_X, TILE_COUNT_Y);
         SpawnAllPieces();
         PositionAllPieces();
-    }
-    private void Start()
-    {
+        UpdateValidMoveForAllPieces();
+
         deadList.SetupDeadList(GetTileCenter(8, -1), GetTileCenter(-1, 8), tileSize, transform.forward);
     }
+
+    private void SetupSingleton()
+    {
+        Singleton = this;
+    }
+
+    private void InitializeValues()
+    {
+        yOffset = ChessBoardConfiguration.Singleton.yOffset;
+        tileSize = ChessBoardConfiguration.Singleton.tileSize;
+        TILE_COUNT_X = ChessBoardConfiguration.Singleton.TILE_COUNT_X;
+        TILE_COUNT_Y = ChessBoardConfiguration.Singleton.TILE_COUNT_Y;
+        smoothTime = ChessBoardConfiguration.Singleton.smoothTime;
+    }
+
 
     private void Update()
     {
@@ -184,6 +209,12 @@ public class ChessBoard : MonoBehaviour
         currentSelectedPiece = null;
 
         PositionASinglePiece(currentHover.x, currentHover.y);
+        chessPieces[currentHover.x, currentHover.y].UpdateValidMoveList();
+
+
+        if (chessPieces[currentHover.x, currentHover.y].pieceType == ChessPieceType.Pawn)
+            (chessPieces[currentHover.x, currentHover.y] as Pawn).hasMadeFirstMove = false;
+
         MoveDeadPieceToDeadList(deadPiece);
     }
 
@@ -313,6 +344,21 @@ public class ChessBoard : MonoBehaviour
         else
         {
             StartCoroutine(SmoothPositionASinglePiece(chessPieces[x, y], GetTileCenter(x, y)));
+        }
+    }
+
+    private void UpdateValidMoveForAllPieces()
+    {
+        int counter = 0;
+        foreach (ChessPiece cp in chessPieces)
+        {
+            if (cp == null) continue;
+
+            if (cp.pieceType == ChessPieceType.Pawn)
+                (cp as Pawn).hasMadeFirstMove = false;
+
+            cp.UpdateValidMoveList();
+            counter++;
         }
     }
 
