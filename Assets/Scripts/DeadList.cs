@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DeadList
+public class DeadList : MonoBehaviour
 {
+    [SerializeField] private int smoothTime = 50;
     private List<ChessPiece> blueDeadList;
     private List<ChessPiece> redDeadList;
 
@@ -16,7 +18,7 @@ public class DeadList
     private Vector3 bluePieceForward;
     private Vector3 redPieceForward;
 
-    public DeadList(Vector3 blueDeadListPosition, Vector3 redDeadListPosition, float tileSize, Vector3 chessBoardForward)
+    public void SetupDeadList(Vector3 blueDeadListPosition, Vector3 redDeadListPosition, float tileSize, Vector3 chessBoardForward)
     {
         blueDeadList = new List<ChessPiece>();
         redDeadList = new List<ChessPiece>();
@@ -46,8 +48,19 @@ public class DeadList
     {
         deadPiece.transform.localScale = deadPiece.transform.localScale * deadSizeMultiplier;
 
-        deadPiece.transform.position = ((deadPiece.team == Team.Blue) ?
+        Vector3 targetPos = ((deadPiece.team == Team.Blue) ?
             blueDeadListPosition + bluePieceForward * (blueDeadList.Count - 1) * deadTileSize :
             redDeadListPosition + redPieceForward * (redDeadList.Count - 1) * deadTileSize);
+
+        StartCoroutine(SmoothUpdateDeadListPosition(deadPiece, targetPos));
+    }
+
+    private IEnumerator SmoothUpdateDeadListPosition(ChessPiece deadPiece, Vector3 targetPos)
+    {
+        for (float i = 0; i <= smoothTime; i++)
+        {
+            deadPiece.transform.position = Vector3.Lerp(deadPiece.transform.position, targetPos, i / smoothTime);
+            yield return null;
+        }
     }
 }

@@ -25,15 +25,15 @@ public class ChessBoardInputEvent : MonoBehaviour
                 onLeftMouseButtonHold();
 
         if (Input.GetMouseButtonDown(1))
-            if (onLeftMouseButtonDown != null)
-                onLeftMouseButtonDown();
+            if (onRightMouseButtonDown != null)
+                onRightMouseButtonDown();
 
         if (Input.GetMouseButtonUp(1))
-            if (onLeftMouseButtonUp != null)
-                onLeftMouseButtonUp();
+            if (onRightMouseButtonUp != null)
+                onRightMouseButtonUp();
 
         if (Input.GetMouseButton(1))
-            if (onLeftMouseButtonHold != null)
-                onLeftMouseButtonHold();
+            if (onRightMouseButtonHold != null)
+                onRightMouseButtonHold();
     }
 }

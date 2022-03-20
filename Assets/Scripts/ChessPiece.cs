@@ -19,33 +19,21 @@ public class ChessPiece : MonoBehaviour
     public int currentX;
     public int currentY;
 
-    private Vector3 desiredPosition;
-    private Vector3 desiredScale;
-    private float closeDistance = 0.1f;
-
     public bool IsSelected { get; private set; }
+    public float yNormal;
+    public float ySelected;
 
     public void Select()
     {
         if (!IsSelected)
         {
             IsSelected = true;
-            StartCoroutine(MovePiece(IsSelected));
         }
         else
         {
             IsSelected = false;
-            StartCoroutine(MovePiece(IsSelected));
         }
-    }
 
-    private IEnumerator MovePiece(bool up)
-    {
-        Vector3 desiredUpPosition = transform.position += (up ? Vector3.up : -Vector3.up) * 2f;
-        while ((transform.position - desiredUpPosition).sqrMagnitude < closeDistance * closeDistance)
-        {
-            transform.position = Vector3.Lerp(transform.position, desiredUpPosition, Time.deltaTime * 10f);
-            yield return null;
-        }
+        transform.position = new Vector3(transform.position.x, IsSelected ? ySelected : yNormal, transform.position.z);
     }
 }

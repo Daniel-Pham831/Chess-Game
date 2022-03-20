@@ -21,15 +21,18 @@ public class ChessBoard : MonoBehaviour
     [SerializeField] private List<GameObject> prefabs;
     [SerializeField] private List<Material> teamMaterials;
 
+    [Header("Chess Movement")]
+    [SerializeField] private int smoothTime = 25;
+
     // For logics
     private ChessPiece[,] chessPieces;
     private ChessPiece currentSelectedPiece;
     private DeadList deadList;
 
     // Player Turn
-    public Team currentTurn;
-    public Team playerTeam;
-    public Team otherTeam;
+    private Team currentTurn;
+    private Team playerTeam;
+    private Team otherTeam;
 
     // For generateAllTiles
     private const int TILE_COUNT_X = 8;
@@ -52,12 +55,16 @@ public class ChessBoard : MonoBehaviour
         otherTeam = Team.Red;
 
         currentSelectedPiece = null;
+        deadList = GetComponent<DeadList>();
 
 
         GenerateAllTiles(tileSize, TILE_COUNT_X, TILE_COUNT_Y);
         SpawnAllPieces();
         PositionAllPieces();
-        deadList = new DeadList(GetTileCenter(8, -1), GetTileCenter(-1, 8), tileSize, transform.forward);
+    }
+    private void Start()
+    {
+        deadList.SetupDeadList(GetTileCenter(8, -1), GetTileCenter(-1, 8), tileSize, transform.forward);
     }
 
     private void Update()
@@ -166,16 +173,17 @@ public class ChessBoard : MonoBehaviour
 
     private void ReplaceHoverPieceWithCurrentSelectedPiece(bool killConfirm = false)
     {
+        currentSelectedPiece.Select();
+
         ChessPiece tempChessPiece = currentSelectedPiece;
         ChessPiece deadPiece = killConfirm ? chessPieces[currentHover.x, currentHover.y] : null;
 
         chessPieces[currentHover.x, currentHover.y] = currentSelectedPiece;
         chessPieces[tempChessPiece.currentX, tempChessPiece.currentY] = null;
 
-        currentSelectedPiece.Select();
         currentSelectedPiece = null;
 
-        PositionASinglePiece(currentHover.x, currentHover.y, true);
+        PositionASinglePiece(currentHover.x, currentHover.y);
         MoveDeadPieceToDeadList(deadPiece);
     }
 
@@ -290,13 +298,31 @@ public class ChessBoard : MonoBehaviour
         for (int x = 0; x < TILE_COUNT_X; x++)
             for (int y = 0; y < TILE_COUNT_Y; y++)
                 if (chessPieces[x, y] != null)
+                {
                     PositionASinglePiece(x, y, true);
+                    chessPieces[x, y].yNormal = chessPieces[x, y].transform.position.y;
+                    chessPieces[x, y].ySelected = chessPieces[x, y].transform.position.y * 2f;
+                }
     }
     private void PositionASinglePiece(int x, int y, bool force = false)
     {
         chessPieces[x, y].currentX = x;
         chessPieces[x, y].currentY = y;
-        chessPieces[x, y].transform.position = GetTileCenter(x, y);
+        if (force)
+            chessPieces[x, y].transform.position = GetTileCenter(x, y);
+        else
+        {
+            StartCoroutine(SmoothPositionASinglePiece(chessPieces[x, y], GetTileCenter(x, y)));
+        }
+    }
+
+    private IEnumerator SmoothPositionASinglePiece(ChessPiece cp, Vector3 targetPos)
+    {
+        for (float i = 0; i <= smoothTime; i++)
+        {
+            cp.transform.position = Vector3.Lerp(cp.transform.position, targetPos, i / smoothTime);
+            yield return null;
+        }
     }
 
     private Vector3 GetTileCenter(int x, int y)
