@@ -380,6 +380,15 @@ MonoBehaviour:
   teamMaterials:
   - {fileID: 2100000, guid: d055784c1de04ae4984c52fc05bbf2c9, type: 2}
   - {fileID: 2100000, guid: b208f066afc0e914493768ec3856c452, type: 2}
+  normalTileLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  hoverTileLayerMask:
+    serializedVersion: 2
+    m_Bits: 8320
+  movableTileLayerMask:
+    serializedVersion: 2
+    m_Bits: 16640
 --- !u!4 &543450652230101980
 Transform:
   m_ObjectHideFlags: 0

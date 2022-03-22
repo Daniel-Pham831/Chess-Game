@@ -132,6 +132,17 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
+    public void ShowMovableOf(List<Vector2Int> movableList, bool reset = false)
+    {
+        foreach (Vector2Int movable in movableList)
+        {
+            if (!reset)
+                tiles[movable.x, movable.y].layer = LayerMask.NameToLayer("Movable");
+            else
+                tiles[movable.x, movable.y].layer = LayerMask.NameToLayer("Tile");
+        }
+    }
+
     private void OnDestroy()
     {
         registerInputEvent(false);

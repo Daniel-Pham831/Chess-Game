@@ -37,10 +37,12 @@ public abstract class ChessPiece : MonoBehaviour
         if (!IsSelected)
         {
             IsSelected = true;
+            ChessBoard.Singleton.ShowMovableOf(validMoveList);
         }
         else
         {
             IsSelected = false;
+            ChessBoard.Singleton.ShowMovableOf(validMoveList, true);
         }
 
         transform.position = new Vector3(transform.position.x, IsSelected ? ySelected : yNormal, transform.position.z);
