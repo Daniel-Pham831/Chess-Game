@@ -1,3 +1,4 @@
+using System.Data.Common;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,6 +6,12 @@ public class Pawn : ChessPiece
 {
     [HideInInspector] public bool hasMadeFirstMove = false;
 
+    protected override void Awake()
+    {
+        base.Awake();
+
+        hasMadeFirstMove = false;
+    }
     protected override List<Vector2Int> GetAllPossibleMove()
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();

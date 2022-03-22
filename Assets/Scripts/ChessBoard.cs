@@ -19,6 +19,10 @@ public class ChessBoard : MonoBehaviour
     [SerializeField] private List<GameObject> prefabs;
     [SerializeField] private List<Material> teamMaterials;
 
+    private const string tileLayer = "Tile";
+    private const string hoverLayer = "Hover";
+    private const string movableLayer = "Movable";
+
     // For logics
     public ChessPiece[,] chessPieces;
     private ChessPiece currentSelectedPiece;
@@ -72,7 +76,6 @@ public class ChessBoard : MonoBehaviour
         GenerateAllTiles(tileSize, TILE_COUNT_X, TILE_COUNT_Y);
         SpawnAllPieces();
         PositionAllPieces();
-        UpdateValidMoveForAllPieces();
 
         deadList.SetupDeadList(GetTileCenter(8, -1), GetTileCenter(-1, 8), tileSize, transform.forward);
     }
@@ -102,7 +105,7 @@ public class ChessBoard : MonoBehaviour
 
         RaycastHit info;
         Ray ray = currentCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask("Tile", "Hover")))
+        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask(tileLayer, hoverLayer, movableLayer)))
         {
             // Get the indexes of the hit tile
             Vector2Int hitPosition = LookupTileIndex(info.transform.gameObject);
@@ -111,22 +114,22 @@ public class ChessBoard : MonoBehaviour
             if (currentHover == -Vector2Int.one)
             {
                 currentHover = hitPosition;
-                tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer("Hover");
+                tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer(hoverLayer);
             }
 
             // If we were already hovering a tile, change the previous one
             if (currentHover != -Vector2Int.one)
             {
-                tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer("Tile");
+                tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer(tileLayer);
                 currentHover = hitPosition;
-                tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer("Hover");
+                tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer(hoverLayer);
             }
         }
         else
         {
             if (currentHover != -Vector2Int.one)
             {
-                tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer("Tile");
+                tiles[currentHover.x, currentHover.y].layer = LayerMask.NameToLayer(tileLayer);
                 currentHover = -Vector2Int.one;
             }
         }
@@ -137,9 +140,9 @@ public class ChessBoard : MonoBehaviour
         foreach (Vector2Int movable in movableList)
         {
             if (!reset)
-                tiles[movable.x, movable.y].layer = LayerMask.NameToLayer("Movable");
+                tiles[movable.x, movable.y].layer = LayerMask.NameToLayer(movableLayer);
             else
-                tiles[movable.x, movable.y].layer = LayerMask.NameToLayer("Tile");
+                tiles[movable.x, movable.y].layer = LayerMask.NameToLayer(tileLayer);
         }
     }
 
@@ -171,7 +174,11 @@ public class ChessBoard : MonoBehaviour
             // If currentSelectedPiece is selected
             if (currentSelectedPiece != null)
             {
-                ReplaceHoverPieceWithCurrentSelectedPiece();
+                if (CanCurrentSelectedPieceMoveHere(currentHover))
+                {
+                    //Debug.Log($"{currentSelectedPiece.pieceType.ToString()} killed {chessPieces[currentHover.x, currentHover.y].pieceType.ToString()}");
+                    ReplaceHoverPieceWithCurrentSelectedPiece(true);
+                }
             }
         }
         else
@@ -220,8 +227,6 @@ public class ChessBoard : MonoBehaviour
         currentSelectedPiece = null;
 
         PositionASinglePiece(currentHover.x, currentHover.y);
-        chessPieces[currentHover.x, currentHover.y].UpdateValidMoveList();
-
 
         if (chessPieces[currentHover.x, currentHover.y].pieceType == ChessPieceType.Pawn)
             (chessPieces[currentHover.x, currentHover.y] as Pawn).hasMadeFirstMove = false;
@@ -238,7 +243,7 @@ public class ChessBoard : MonoBehaviour
 
     private bool CanCurrentSelectedPieceMoveHere(Vector2Int currentHover)
     {
-        return true;
+        return chessPieces[currentSelectedPiece.currentX, currentSelectedPiece.currentY].IsMoveValid(currentHover);
     }
 
     private void registerInputEvent(bool confirm)
@@ -285,7 +290,7 @@ public class ChessBoard : MonoBehaviour
         mesh.triangles = tris;
         mesh.RecalculateNormals();
 
-        tileObject.layer = LayerMask.NameToLayer("Tile");
+        tileObject.layer = LayerMask.NameToLayer(tileLayer);
         tileObject.AddComponent<BoxCollider>();
 
         return tileObject;
@@ -355,21 +360,6 @@ public class ChessBoard : MonoBehaviour
         else
         {
             StartCoroutine(SmoothPositionASinglePiece(chessPieces[x, y], GetTileCenter(x, y)));
-        }
-    }
-
-    private void UpdateValidMoveForAllPieces()
-    {
-        int counter = 0;
-        foreach (ChessPiece cp in chessPieces)
-        {
-            if (cp == null) continue;
-
-            if (cp.pieceType == ChessPieceType.Pawn)
-                (cp as Pawn).hasMadeFirstMove = false;
-
-            cp.UpdateValidMoveList();
-            counter++;
         }
     }
 

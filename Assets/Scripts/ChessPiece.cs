@@ -27,7 +27,7 @@ public abstract class ChessPiece : MonoBehaviour
 
     protected List<Vector2Int> validMoveList;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         validMoveList = new List<Vector2Int>();
     }
@@ -37,6 +37,7 @@ public abstract class ChessPiece : MonoBehaviour
         if (!IsSelected)
         {
             IsSelected = true;
+            UpdateValidMoveList();
             ChessBoard.Singleton.ShowMovableOf(validMoveList);
         }
         else
