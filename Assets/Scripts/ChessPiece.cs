@@ -68,7 +68,15 @@ public abstract class ChessPiece : MonoBehaviour
         if (IsOutsideTheBoard(checkMove))
             return;
 
+        if (IsBeingBlockedByTeamAt(checkMove)) return;
+        if (IsBeingBlockedByOtherTeamAt(checkMove))
+        {
+            allPossibleMoveList.Add(checkMove);
+            return;
+        }
+
         allPossibleMoveList.Add(checkMove);
+
         AddedMoveRecursivelly(ref allPossibleMoveList, checkMove + increament, increament);
     }
 
@@ -80,6 +88,7 @@ public abstract class ChessPiece : MonoBehaviour
 
         return false;
     }
+
     protected bool IsInsideTheBoard(Vector2Int targetMove)
     {
         return !IsOutsideTheBoard(targetMove);

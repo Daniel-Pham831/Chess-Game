@@ -7,35 +7,20 @@ public class Bishop : ChessPiece
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();
 
-        Vector2Int forwardRightDirection = Vector2Int.one;
-        AddedMoveRecursivelly(ref allPossibleMoveList, new Vector2Int(currentX, currentY) + forwardRightDirection, forwardRightDirection);
-
-        Vector2Int backwardRightDirection = -Vector2Int.one;
-        AddedMoveRecursivelly(ref allPossibleMoveList, new Vector2Int(currentX, currentY) + backwardRightDirection, backwardRightDirection);
-
-        Vector2Int forwardLeftDirection = new Vector2Int(-1, 1);
-        AddedMoveRecursivelly(ref allPossibleMoveList, new Vector2Int(currentX, currentY) + forwardLeftDirection, forwardLeftDirection);
-
-        Vector2Int backwardLeftDirection = new Vector2Int(1, -1);
-        AddedMoveRecursivelly(ref allPossibleMoveList, new Vector2Int(currentX, currentY) + backwardLeftDirection, backwardLeftDirection);
-
-        return allPossibleMoveList;
-    }
-
-    protected override void AddedMoveRecursivelly(ref List<Vector2Int> allPossibleMoveList, Vector2Int checkMove, Vector2Int increament)
-    {
-        if (IsOutsideTheBoard(checkMove))
-            return;
-
-        if (IsBeingBlockedByTeamAt(checkMove)) return;
-        if (IsBeingBlockedByOtherTeamAt(checkMove))
+        for (int x = currentX - 1; x <= currentX + 1; x++)
         {
-            allPossibleMoveList.Add(checkMove);
-            return;
+            for (int y = currentY - 1; y <= currentY + 1; y++)
+            {
+                if (x == currentX && y == currentY) continue;
+
+                Vector2Int nextMove = new Vector2Int(x, y);
+                Vector2Int moveDir = nextMove - new Vector2Int(currentX, currentY);
+
+                if (moveDir.x == moveDir.y || moveDir.x + moveDir.y == 0)
+                    AddedMoveRecursivelly(ref allPossibleMoveList, nextMove, moveDir);
+            }
         }
 
-        allPossibleMoveList.Add(checkMove);
-
-        AddedMoveRecursivelly(ref allPossibleMoveList, checkMove + increament, increament);
+        return allPossibleMoveList;
     }
 }
