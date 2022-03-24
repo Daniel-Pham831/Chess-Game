@@ -71,10 +71,29 @@ public abstract class ChessPiece : MonoBehaviour
 
     protected abstract List<Vector2Int> GetAllPossibleMove();
 
-    public virtual void MoveTo(Vector2Int targetMove)
+    public virtual void MoveTo(Vector2Int targetMove, bool force = false)
     {
         currentX = targetMove.x;
         currentY = targetMove.y;
+
+        Vector3 tileCenter = ChessBoard.Singleton.GetTileCenter(targetMove);
+
+        if (force)
+            this.transform.position = tileCenter;
+        else
+        {
+            StartCoroutine(SmoothPositionASinglePiece(tileCenter));
+        }
+    }
+
+    private IEnumerator SmoothPositionASinglePiece(Vector3 targetPos)
+    {
+        int smoothTime = ChessBoardConfiguration.Singleton.smoothTime;
+        for (float i = 0; i <= smoothTime; i++)
+        {
+            transform.position = Vector3.Lerp(transform.position, targetPos, i / smoothTime);
+            yield return null;
+        }
     }
 
     protected virtual void AddedMoveRecursivelly(ref List<Vector2Int> allPossibleMoveList, Vector2Int checkMove, Vector2Int increament)

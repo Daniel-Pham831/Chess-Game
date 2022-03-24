@@ -12,9 +12,11 @@ public class King : ChessPiece
         hasMadeFirstMove = false;
     }
 
-    public override void MoveTo(Vector2Int targetMove)
+    public override void MoveTo(Vector2Int targetMove, bool force = false)
     {
-        base.MoveTo(targetMove);
+        base.MoveTo(targetMove, force);
+
+        if (force) return;
 
         if (!hasMadeFirstMove) hasMadeFirstMove = true;
     }

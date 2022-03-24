@@ -13,15 +13,13 @@ public class Pawn : ChessPiece
         hasMadeFirstMove = false;
     }
 
-    public override void MoveTo(Vector2Int targetMove)
+    public override void MoveTo(Vector2Int targetMove, bool force = false)
     {
-        base.MoveTo(targetMove);
+        base.MoveTo(targetMove, force);
 
-        if (!hasMadeFirstMove)
-        {
-            hasMadeFirstMove = true;
-            Debug.Log("yesy");
-        }
+        if (force) return;
+
+        if (!hasMadeFirstMove) hasMadeFirstMove = true;
     }
 
     protected override List<Vector2Int> GetAllPossibleMove()
