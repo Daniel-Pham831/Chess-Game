@@ -32,13 +32,18 @@ public abstract class ChessPiece : MonoBehaviour
         validMoveList = new List<Vector2Int>();
     }
 
+    private void Update()
+    {
+        if (IsSelected)
+            ChessBoard.Singleton.ShowMovableOf(validMoveList);
+    }
+
     public void Select()
     {
         if (!IsSelected)
         {
             IsSelected = true;
             UpdateValidMoveList();
-            ChessBoard.Singleton.ShowMovableOf(validMoveList);
         }
         else
         {
