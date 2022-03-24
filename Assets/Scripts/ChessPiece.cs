@@ -71,6 +71,12 @@ public abstract class ChessPiece : MonoBehaviour
 
     protected abstract List<Vector2Int> GetAllPossibleMove();
 
+    public virtual void MoveTo(Vector2Int targetMove)
+    {
+        currentX = targetMove.x;
+        currentY = targetMove.y;
+    }
+
     protected virtual void AddedMoveRecursivelly(ref List<Vector2Int> allPossibleMoveList, Vector2Int checkMove, Vector2Int increament)
     {
         if (IsOutsideTheBoard(checkMove))

@@ -226,10 +226,8 @@ public class ChessBoard : MonoBehaviour
 
         currentSelectedPiece = null;
 
+        chessPieces[currentHover.x, currentHover.y].MoveTo(currentHover);
         PositionASinglePiece(currentHover.x, currentHover.y);
-
-        if (chessPieces[currentHover.x, currentHover.y].pieceType == ChessPieceType.Pawn)
-            (chessPieces[currentHover.x, currentHover.y] as Pawn).hasMadeFirstMove = false;
 
         MoveDeadPieceToDeadList(deadPiece);
     }

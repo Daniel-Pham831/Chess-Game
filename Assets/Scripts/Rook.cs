@@ -12,6 +12,13 @@ public class Rook : ChessPiece
         hasMadeFirstMove = false;
     }
 
+    public override void MoveTo(Vector2Int targetMove)
+    {
+        base.MoveTo(targetMove);
+
+        if (!hasMadeFirstMove) hasMadeFirstMove = true;
+    }
+
     protected override List<Vector2Int> GetAllPossibleMove()
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();
