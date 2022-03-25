@@ -29,9 +29,9 @@ public class ChessBoard : MonoBehaviour
     private DeadList deadList;
 
     // Player Turn
-    private Team currentTurn;
-    private Team playerTeam;
-    private Team otherTeam;
+    public Team currentTurn;
+    public Team playerTeam;
+    public Team otherTeam;
 
     // For generateAllTiles
     private float tileSize;
