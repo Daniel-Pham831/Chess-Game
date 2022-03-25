@@ -362,4 +362,20 @@ public class ChessBoard : MonoBehaviour
         return -Vector2Int.one;
     }
 
+    public void SwitchTurn()
+    {
+        if (currentTurn == Team.Blue)
+        {
+            currentTurn = Team.Red;
+            playerTeam = Team.Red;
+            otherTeam = Team.Blue;
+        }
+        else
+        {
+            currentTurn = Team.Blue;
+            playerTeam = Team.Blue;
+            otherTeam = Team.Red;
+        }
+    }
+
 }
