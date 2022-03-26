@@ -5,13 +5,13 @@ using UnityEngine;
 
 public enum ChessPieceType
 {
-    None = -1,
-    Pawn = 0,
-    Rook = 1,
-    Knight = 2,
-    Bishop = 3,
-    Queen = 4,
-    King = 5,
+    NullPiece = 0,
+    Pawn = 1,
+    Rook = 2,
+    Knight = 3,
+    Bishop = 4,
+    Queen = 5,
+    King = 6,
 }
 
 public abstract class ChessPiece : MonoBehaviour
@@ -26,6 +26,10 @@ public abstract class ChessPiece : MonoBehaviour
     public float ySelected;
 
     protected List<Vector2Int> validMoveList;
+
+    // For null checking
+    public bool IsNull => this.pieceType == ChessPieceType.NullPiece ? true : false;
+    public bool IsNotNull => !this.IsNull;
 
     protected virtual void Awake()
     {
@@ -131,21 +135,21 @@ public abstract class ChessPiece : MonoBehaviour
     {
         if (this.IsOutsideTheBoard(targetMove)) return true; // If outside the board then count as being blocked
 
-        return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y] != null ? true : false;
+        return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].IsNotNull ? true : false;
     }
 
     protected virtual bool IsBeingBlockedByTeamAt(Vector2Int targetMove)
     {
         if (this.IsOutsideTheBoard(targetMove)) return true;
 
-        return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y] != null ?
+        return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].IsNotNull ?
             (ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].team == this.team ? true : false)
                 : false;
     }
 
     protected virtual bool IsBeingBlockedByOtherTeamAt(Vector2Int targetMove)
     {
-        return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y] != null ?
+        return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].IsNotNull ?
             (ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].team != this.team ? true : false)
                 : false;
     }

@@ -13,27 +13,21 @@ public class ChessBoardInputEvent : MonoBehaviour
     private void Update()
     {
         if (Input.GetMouseButtonDown(0))
-            if (this.onLeftMouseButtonDown != null)
-                this.onLeftMouseButtonDown();
+            this.onLeftMouseButtonDown?.Invoke();
 
         if (Input.GetMouseButtonUp(0))
-            if (this.onLeftMouseButtonUp != null)
-                this.onLeftMouseButtonUp();
+            this.onLeftMouseButtonUp?.Invoke();
 
         if (Input.GetMouseButton(0))
-            if (this.onLeftMouseButtonHold != null)
-                this.onLeftMouseButtonHold();
+            this.onLeftMouseButtonHold?.Invoke();
 
         if (Input.GetMouseButtonDown(1))
-            if (this.onRightMouseButtonDown != null)
-                this.onRightMouseButtonDown();
+            this.onRightMouseButtonDown?.Invoke();
 
         if (Input.GetMouseButtonUp(1))
-            if (this.onRightMouseButtonUp != null)
-                this.onRightMouseButtonUp();
+            this.onRightMouseButtonUp?.Invoke();
 
         if (Input.GetMouseButton(1))
-            if (this.onRightMouseButtonHold != null)
-                this.onRightMouseButtonHold();
+            this.onRightMouseButtonHold?.Invoke();
     }
 }

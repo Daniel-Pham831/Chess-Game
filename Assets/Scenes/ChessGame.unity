@@ -767,6 +767,7 @@ MonoBehaviour:
   tileMaterial: {fileID: 2100000, guid: 6f57284b0fc68c641a7427a76cd5437e, type: 2}
   boardCenter: {x: 0, y: 0, z: 0}
   prefabs:
+  - {fileID: 2420682816290404270, guid: 2962094c135e2104bae9e2649f9d6d79, type: 3}
   - {fileID: 1584305380508448676, guid: 95fe567ab18cd4941ade689cd7e62f64, type: 3}
   - {fileID: 3595467369300879774, guid: 4f9a61a7d636dc842a7462a0a9740194, type: 3}
   - {fileID: 6209427754298481806, guid: 902afa45ea2da8640bee1ef58cfab9cc, type: 3}

@@ -3,12 +3,13 @@ using UnityEngine;
 
 public class NullPiece : ChessPiece
 {
-    [HideInInspector] public bool isNull;
     [HideInInspector] public bool isBeingAttacked;
 
     protected override void Awake()
     {
         base.Awake();
+
+        this.pieceType = ChessPieceType.NullPiece;
 
         this.Reset();
     }
@@ -20,7 +21,6 @@ public class NullPiece : ChessPiece
 
     protected void Reset()
     {
-        this.isNull = false;
         this.isBeingAttacked = false;
     }
 }

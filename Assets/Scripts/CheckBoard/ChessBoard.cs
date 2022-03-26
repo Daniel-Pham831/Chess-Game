@@ -26,6 +26,7 @@ public class ChessBoard : MonoBehaviour
     // For logics
     public ChessPiece[,] chessPieces;
     private ChessPiece currentSelectedPiece;
+    private ChessPiece nullPiece;
     private DeadList deadList;
 
     // Player Turn
@@ -63,7 +64,8 @@ public class ChessBoard : MonoBehaviour
         this.playerTeam = Team.Blue;
         this.otherTeam = Team.Red;
 
-        this.currentSelectedPiece = null;
+        this.nullPiece = this.SpawnNullPiece();
+        this.currentSelectedPiece = this.nullPiece;
         this.deadList = GetComponent<DeadList>();
 
         this.chessBoardConfiguration = ChessBoardConfiguration.Singleton;
@@ -160,18 +162,18 @@ public class ChessBoard : MonoBehaviour
         if (this.currentHover == -Vector2Int.one)
         {
             // If currentSelectedPiece is selected
-            if (this.currentSelectedPiece != null)
+            if (this.currentSelectedPiece.IsNotNull)
                 this.currentSelectedPiece.Select();
 
-            this.currentSelectedPiece = null;
+            this.currentSelectedPiece = this.nullPiece;
 
             return;
         }
 
-        if (this.chessPieces[this.currentHover.x, this.currentHover.y] == null)
+        if (this.chessPieces[this.currentHover.x, this.currentHover.y].IsNull)
         {
             // If currentSelectedPiece is selected
-            if (this.currentSelectedPiece != null)
+            if (this.currentSelectedPiece.IsNotNull)
             {
                 if (this.CanCurrentSelectedPieceMoveHere(this.currentHover))
                 {
@@ -184,7 +186,7 @@ public class ChessBoard : MonoBehaviour
             // If chessPiece at currentHover is not our piece
             if (this.chessPieces[this.currentHover.x, this.currentHover.y].team != this.playerTeam)
             {
-                if (this.currentSelectedPiece == null) return;
+                if (this.currentSelectedPiece.IsNull) return;
 
                 if (this.CanCurrentSelectedPieceMoveHere(this.currentHover))
                 {
@@ -198,10 +200,10 @@ public class ChessBoard : MonoBehaviour
             }
             else
             {
-                if (this.currentSelectedPiece != null)
+                if (this.currentSelectedPiece.IsNotNull)
                 {
                     this.currentSelectedPiece.Select();
-                    this.currentSelectedPiece = null;
+                    this.currentSelectedPiece = this.nullPiece;
                 }
                 else
                 {
@@ -217,12 +219,12 @@ public class ChessBoard : MonoBehaviour
         this.currentSelectedPiece.Select();
 
         ChessPiece tempChessPiece = this.currentSelectedPiece;
-        ChessPiece deadPiece = killConfirm ? this.chessPieces[this.currentHover.x, this.currentHover.y] : null;
+        ChessPiece deadPiece = killConfirm ? this.chessPieces[this.currentHover.x, this.currentHover.y] : this.nullPiece;
 
         this.chessPieces[this.currentHover.x, this.currentHover.y] = this.currentSelectedPiece;
-        this.chessPieces[tempChessPiece.currentX, tempChessPiece.currentY] = null;
+        this.chessPieces[tempChessPiece.currentX, tempChessPiece.currentY] = this.nullPiece;
 
-        this.currentSelectedPiece = null;
+        this.currentSelectedPiece = this.nullPiece;
 
         this.chessPieces[this.currentHover.x, this.currentHover.y].MoveTo(this.currentHover);
 
@@ -233,7 +235,7 @@ public class ChessBoard : MonoBehaviour
 
     private void MoveDeadPieceToDeadList(ChessPiece deadPiece)
     {
-        if (deadPiece == null) return;
+        if (deadPiece.IsNull) return;
 
         this.deadList.AddPieceToDeadList(deadPiece);
     }
@@ -321,6 +323,15 @@ public class ChessBoard : MonoBehaviour
         this.chessPieces[7, 7] = this.SpawnSinglePiece(ChessPieceType.Rook, Team.Red);
         for (int i = 0; i < this.TILE_COUNT_X; i++)
             this.chessPieces[i, 6] = this.SpawnSinglePiece(ChessPieceType.Pawn, Team.Red);
+
+        for (int x = 0; x < this.TILE_COUNT_X; x++)
+        {
+            for (int y = 0; y < this.TILE_COUNT_Y; y++)
+            {
+                if (this.chessPieces[x, y] == null)
+                    this.chessPieces[x, y] = this.SpawnNullPiece();
+            }
+        }
     }
     private ChessPiece SpawnSinglePiece(ChessPieceType pieceType, Team team)
     {
@@ -335,18 +346,24 @@ public class ChessBoard : MonoBehaviour
 
         return cp;
     }
+    private ChessPiece SpawnNullPiece()
+    {
+        ChessPiece cp = Instantiate(this.prefabs[(int)ChessPieceType.NullPiece], transform).GetComponent<ChessPiece>();
+        cp.pieceType = ChessPieceType.NullPiece;
+
+        return cp;
+    }
 
     // Position
     private void PositionAllPieces()
     {
         for (int x = 0; x < this.TILE_COUNT_X; x++)
             for (int y = 0; y < this.TILE_COUNT_Y; y++)
-                if (this.chessPieces[x, y] != null)
-                {
-                    this.chessPieces[x, y].MoveTo(new Vector2Int(x, y), true);
-                    this.chessPieces[x, y].yNormal = this.chessPieces[x, y].transform.position.y;
-                    this.chessPieces[x, y].ySelected = this.chessPieces[x, y].transform.position.y * 2f;
-                }
+            {
+                this.chessPieces[x, y].MoveTo(new Vector2Int(x, y), true);
+                this.chessPieces[x, y].yNormal = this.chessPieces[x, y].transform.position.y;
+                this.chessPieces[x, y].ySelected = this.chessPieces[x, y].transform.position.y * 2f;
+            }
     }
 
     public Vector3 GetTileCenter(Vector2Int position)
