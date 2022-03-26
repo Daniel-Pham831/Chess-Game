@@ -5,6 +5,7 @@ using UnityEngine;
 public class Pawn : ChessPiece
 {
     [HideInInspector] public bool hasMadeFirstMove = false;
+    [HideInInspector] public bool enPassant = false;
 
     protected override void Awake()
     {
