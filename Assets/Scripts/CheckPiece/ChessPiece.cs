@@ -25,6 +25,9 @@ public abstract class ChessPiece : MonoBehaviour
     public float yNormal;
     public float ySelected;
 
+    [HideInInspector] public bool isBeingAttackedByBlue;
+    [HideInInspector] public bool isBeingAttackedByRed;
+
     protected List<Vector2Int> validMoveList;
 
     // For null checking
@@ -34,7 +37,11 @@ public abstract class ChessPiece : MonoBehaviour
     protected virtual void Awake()
     {
         this.validMoveList = new List<Vector2Int>();
+
+        this.Reset();
     }
+
+    protected virtual void Start() { }
 
     private void Update()
     {
@@ -71,9 +78,29 @@ public abstract class ChessPiece : MonoBehaviour
     public void UpdateValidMoveList()
     {
         this.validMoveList = GetAllPossibleMove();
+
+        ChessPiece[,] chessPieces = ChessBoard.Singleton.chessPieces;
+        foreach (Vector2Int validMove in this.validMoveList)
+        {
+            chessPieces[validMove.x, validMove.y].SetIsBeingAttacked(this.team, true);
+        }
     }
 
     protected abstract List<Vector2Int> GetAllPossibleMove();
+
+    protected void Reset()
+    {
+        this.isBeingAttackedByBlue = false;
+        this.isBeingAttackedByRed = false;
+    }
+
+    public void SetIsBeingAttacked(Team attackerTeam, bool value)
+    {
+        if (attackerTeam == Team.Blue)
+            isBeingAttackedByBlue = value;
+        else
+            isBeingAttackedByRed = value;
+    }
 
     public virtual void MoveTo(Vector2Int targetMove, bool force = false)
     {

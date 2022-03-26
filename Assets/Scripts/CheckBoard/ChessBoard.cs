@@ -348,10 +348,7 @@ public class ChessBoard : MonoBehaviour
     }
     private ChessPiece SpawnNullPiece()
     {
-        ChessPiece cp = Instantiate(this.prefabs[(int)ChessPieceType.NullPiece], transform).GetComponent<ChessPiece>();
-        cp.pieceType = ChessPieceType.NullPiece;
-
-        return cp;
+        return Instantiate(this.prefabs[(int)ChessPieceType.NullPiece], transform).GetComponent<ChessPiece>();
     }
 
     // Position

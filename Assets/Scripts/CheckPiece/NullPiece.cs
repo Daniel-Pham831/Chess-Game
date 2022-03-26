@@ -1,26 +1,20 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class NullPiece : ChessPiece
 {
-    [HideInInspector] public bool isBeingAttacked;
-
     protected override void Awake()
     {
         base.Awake();
 
-        this.pieceType = ChessPieceType.NullPiece;
-
-        this.Reset();
+        currentX = -1;
+        currentY = -1;
+        pieceType = ChessPieceType.NullPiece;
     }
 
     protected override List<Vector2Int> GetAllPossibleMove()
     {
         return new List<Vector2Int>();
-    }
-
-    protected void Reset()
-    {
-        this.isBeingAttacked = false;
     }
 }
