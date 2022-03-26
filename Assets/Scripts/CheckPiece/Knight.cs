@@ -23,6 +23,11 @@ public class Knight : ChessPiece
 
                 if (moveDir.x == moveDir.y || moveDir.x + moveDir.y == 0) continue;
 
+                if (this.IsBeingBlockedByOtherTeamAt(nextMove))
+                {
+                    this.capturableMoveList.Add(nextMove);
+                    continue;
+                }
 
                 allPossibleMoveList.Add(nextMove);
             }

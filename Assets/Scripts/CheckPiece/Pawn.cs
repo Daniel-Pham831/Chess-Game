@@ -43,12 +43,12 @@ public class Pawn : ChessPiece
         forwardLeft = new Vector2Int(this.currentX - 1, this.currentY + 1 * teamForward);
         if (this.IsInsideTheBoard(forwardLeft))
             if (this.IsBeingBlockedByOtherTeamAt(forwardLeft))
-                allPossibleMoveList.Add(forwardLeft);
+                this.capturableMoveList.Add(forwardLeft);
 
         forwardRight = new Vector2Int(this.currentX + 1, this.currentY + 1 * teamForward);
         if (this.IsInsideTheBoard(forwardRight))
             if (this.IsBeingBlockedByOtherTeamAt(forwardRight))
-                allPossibleMoveList.Add(forwardRight);
+                this.capturableMoveList.Add(forwardRight);
 
         return allPossibleMoveList;
     }

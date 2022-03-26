@@ -29,6 +29,7 @@ public abstract class ChessPiece : MonoBehaviour
     [HideInInspector] public bool isBeingAttackedByRed;
 
     protected List<Vector2Int> validMoveList;
+    protected List<Vector2Int> capturableMoveList;
 
     // For null checking
     public bool IsNull => this.pieceType == ChessPieceType.NullPiece ? true : false;
@@ -37,6 +38,7 @@ public abstract class ChessPiece : MonoBehaviour
     protected virtual void Awake()
     {
         this.validMoveList = new List<Vector2Int>();
+        this.capturableMoveList = new List<Vector2Int>();
 
         this.Reset();
     }
@@ -46,7 +48,7 @@ public abstract class ChessPiece : MonoBehaviour
     private void Update()
     {
         if (this.IsSelected)
-            ChessBoard.Singleton.ShowMovableOf(this.validMoveList);
+            ChessBoard.Singleton.ShowMovableOf(this.validMoveList, this.capturableMoveList);
     }
 
     public void Select()
@@ -54,12 +56,12 @@ public abstract class ChessPiece : MonoBehaviour
         if (!this.IsSelected)
         {
             this.IsSelected = true;
-            UpdateValidMoveList();
+            this.UpdateValidMoveList();
         }
         else
         {
             this.IsSelected = false;
-            ChessBoard.Singleton.ShowMovableOf(this.validMoveList, true);
+            ChessBoard.Singleton.ShowMovableOf(this.validMoveList, this.capturableMoveList, true);
         }
 
         this.transform.position = new Vector3(this.transform.position.x, this.IsSelected ? this.ySelected : this.yNormal, this.transform.position.z);
@@ -72,15 +74,20 @@ public abstract class ChessPiece : MonoBehaviour
             if (validMove == targetMove) return true;
         }
 
+        foreach (Vector2Int capturableMove in this.capturableMoveList)
+        {
+            if (capturableMove == targetMove) return true;
+        }
+
         return false;
     }
 
     public void UpdateValidMoveList()
     {
-        this.validMoveList = GetAllPossibleMove();
+        this.validMoveList = this.GetAllPossibleMove();
 
         ChessPiece[,] chessPieces = ChessBoard.Singleton.chessPieces;
-        foreach (Vector2Int validMove in this.validMoveList)
+        foreach (Vector2Int validMove in this.capturableMoveList)
         {
             chessPieces[validMove.x, validMove.y].SetIsBeingAttacked(this.team, true);
         }
@@ -127,7 +134,7 @@ public abstract class ChessPiece : MonoBehaviour
         }
     }
 
-    protected virtual void AddedMoveRecursivelly(ref List<Vector2Int> allPossibleMoveList, Vector2Int checkMove, Vector2Int increament)
+    protected virtual void AddedMoveRecursivelly(ref List<Vector2Int> allPossibleMoveList, ref List<Vector2Int> capturableMoveList, Vector2Int checkMove, Vector2Int increament)
     {
         if (this.IsOutsideTheBoard(checkMove))
             return;
@@ -135,13 +142,13 @@ public abstract class ChessPiece : MonoBehaviour
         if (this.IsBeingBlockedByTeamAt(checkMove)) return;
         if (this.IsBeingBlockedByOtherTeamAt(checkMove))
         {
-            allPossibleMoveList.Add(checkMove);
+            capturableMoveList.Add(checkMove);
             return;
         }
 
         allPossibleMoveList.Add(checkMove);
 
-        this.AddedMoveRecursivelly(ref allPossibleMoveList, checkMove + increament, increament);
+        this.AddedMoveRecursivelly(ref allPossibleMoveList, ref capturableMoveList, checkMove + increament, increament);
     }
 
     protected bool IsOutsideTheBoard(Vector2Int targetMove)

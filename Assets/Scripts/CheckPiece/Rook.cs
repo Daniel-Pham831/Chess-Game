@@ -36,7 +36,7 @@ public class Rook : ChessPiece
 
                 if (moveDir.x == moveDir.y || moveDir.x + moveDir.y == 0) continue;
 
-                this.AddedMoveRecursivelly(ref allPossibleMoveList, nextMove, moveDir);
+                this.AddedMoveRecursivelly(ref allPossibleMoveList, ref this.capturableMoveList, nextMove, moveDir);
             }
         }
 

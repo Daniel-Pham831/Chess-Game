@@ -16,7 +16,7 @@ public class Queen : ChessPiece
                 Vector2Int nextMove = new Vector2Int(x, y);
                 Vector2Int moveDir = nextMove - new Vector2Int(this.currentX, this.currentY);
 
-                this.AddedMoveRecursivelly(ref allPossibleMoveList, nextMove, moveDir);
+                this.AddedMoveRecursivelly(ref allPossibleMoveList, ref this.capturableMoveList, nextMove, moveDir);
             }
         }
 

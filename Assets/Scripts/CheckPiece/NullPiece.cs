@@ -8,9 +8,9 @@ public class NullPiece : ChessPiece
     {
         base.Awake();
 
-        currentX = -1;
-        currentY = -1;
-        pieceType = ChessPieceType.NullPiece;
+        this.currentX = -1;
+        this.currentY = -1;
+        this.pieceType = ChessPieceType.NullPiece;
     }
 
     protected override List<Vector2Int> GetAllPossibleMove()

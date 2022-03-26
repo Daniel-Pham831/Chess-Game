@@ -22,6 +22,8 @@ public class ChessBoard : MonoBehaviour
     private string tileLayer = "Tile";
     private string hoverLayer = "Hover";
     private string movableLayer = "Movable";
+    private string capturableLayer = "Capturable";
+    private List<string> layerList;
 
     // For logics
     public ChessPiece[,] chessPieces;
@@ -68,6 +70,13 @@ public class ChessBoard : MonoBehaviour
         this.currentSelectedPiece = this.nullPiece;
         this.deadList = GetComponent<DeadList>();
 
+        this.layerList = new List<string>(){
+             this.tileLayer,
+             this.hoverLayer,
+             this.movableLayer,
+             this.capturableLayer
+        };
+
         this.chessBoardConfiguration = ChessBoardConfiguration.Singleton;
     }
 
@@ -106,7 +115,7 @@ public class ChessBoard : MonoBehaviour
 
         RaycastHit info;
         Ray ray = this.currentCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask(this.tileLayer, this.hoverLayer, this.movableLayer)))
+        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask(this.layerList.ToArray())))
         {
             // Get the indexes of the hit tile
             Vector2Int hitPosition = this.LookupTileIndex(info.transform.gameObject);
@@ -136,7 +145,7 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
-    public void ShowMovableOf(List<Vector2Int> movableList, bool reset = false)
+    public void ShowMovableOf(List<Vector2Int> movableList, List<Vector2Int> capturableList, bool reset = false)
     {
         foreach (Vector2Int movable in movableList)
         {
@@ -144,6 +153,14 @@ public class ChessBoard : MonoBehaviour
                 this.tiles[movable.x, movable.y].layer = LayerMask.NameToLayer(this.movableLayer);
             else
                 this.tiles[movable.x, movable.y].layer = LayerMask.NameToLayer(this.tileLayer);
+        }
+
+        foreach (Vector2Int capturable in capturableList)
+        {
+            if (!reset)
+                this.tiles[capturable.x, capturable.y].layer = LayerMask.NameToLayer(this.capturableLayer);
+            else
+                this.tiles[capturable.x, capturable.y].layer = LayerMask.NameToLayer(this.tileLayer);
         }
     }
 
@@ -300,7 +317,7 @@ public class ChessBoard : MonoBehaviour
     {
         this.chessPieces = new ChessPiece[this.TILE_COUNT_X, this.TILE_COUNT_Y];
 
-        // Spawn team1 pieces
+        // Spawn blue team pieces
         this.chessPieces[0, 0] = this.SpawnSinglePiece(ChessPieceType.Rook, Team.Blue);
         this.chessPieces[1, 0] = this.SpawnSinglePiece(ChessPieceType.Knight, Team.Blue);
         this.chessPieces[2, 0] = this.SpawnSinglePiece(ChessPieceType.Bishop, Team.Blue);
@@ -312,7 +329,7 @@ public class ChessBoard : MonoBehaviour
         for (int i = 0; i < this.TILE_COUNT_X; i++)
             this.chessPieces[i, 1] = this.SpawnSinglePiece(ChessPieceType.Pawn, Team.Blue);
 
-        // Spawn team1 pieces
+        // Spawn red team pieces
         this.chessPieces[0, 7] = this.SpawnSinglePiece(ChessPieceType.Rook, Team.Red);
         this.chessPieces[1, 7] = this.SpawnSinglePiece(ChessPieceType.Knight, Team.Red);
         this.chessPieces[2, 7] = this.SpawnSinglePiece(ChessPieceType.Bishop, Team.Red);
@@ -324,6 +341,8 @@ public class ChessBoard : MonoBehaviour
         for (int i = 0; i < this.TILE_COUNT_X; i++)
             this.chessPieces[i, 6] = this.SpawnSinglePiece(ChessPieceType.Pawn, Team.Red);
 
+
+        // Spawn null pieces
         for (int x = 0; x < this.TILE_COUNT_X; x++)
         {
             for (int y = 0; y < this.TILE_COUNT_Y; y++)
@@ -396,5 +415,4 @@ public class ChessBoard : MonoBehaviour
 
         this.onTurnSwitched?.Invoke();
     }
-
 }

@@ -34,15 +34,19 @@ public class King : ChessPiece
 
                 Vector2Int nextMove = new Vector2Int(x, y);
 
-                if (this.IsOutsideTheBoard(nextMove))
-                    continue;
+                if (this.IsOutsideTheBoard(nextMove)) continue;
 
                 if (this.IsBeingBlockedByTeamAt(nextMove)) continue;
+
+                if (this.IsBeingBlockedByOtherTeamAt(nextMove))
+                {
+                    this.capturableMoveList.Add(nextMove);
+                    continue;
+                }
 
                 allPossibleMoveList.Add(nextMove);
             }
         }
-
         return allPossibleMoveList;
     }
 }
