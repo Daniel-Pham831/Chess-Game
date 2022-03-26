@@ -4,7 +4,7 @@ using UnityEngine;
 public class King : ChessPiece
 {
     [HideInInspector] public bool hasMadeFirstMove = false;
-    [HideInInspector] public bool isBeingCheck = false;
+    [HideInInspector] public bool isBeingChecked = false;
 
     protected override void Awake()
     {
