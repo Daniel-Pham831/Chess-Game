@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Singleton { get; private set; }
-    public Button button;
+    public Image currentTurnUI;
     public Material blueTeamMaterial;
     public Material redTeamMaterial;
 
@@ -14,13 +14,13 @@ public class UIManager : MonoBehaviour
     {
         if (Singleton != null)
             Singleton = this;
-
-        button.onClick.AddListener(HandleButtonOnClick);
     }
 
-    public void HandleButtonOnClick()
+    private void Start()
     {
-        ChessBoard.Singleton.SwitchTurn();
-        button.image.color = ChessBoard.Singleton.currentTurn == Team.Blue ? blueTeamMaterial.color : redTeamMaterial.color;
+        ChessBoard.Singleton.onTurnSwitched += () =>
+                {
+                    currentTurnUI.color = ChessBoard.Singleton.currentTurn == Team.Blue ? blueTeamMaterial.color : redTeamMaterial.color;
+                };
     }
 }

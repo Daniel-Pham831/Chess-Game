@@ -45,11 +45,12 @@ public class ChessBoard : MonoBehaviour
 
     // For events
     private ChessBoardInputEvent chessBoardInputEvent;
+    public event Action onTurnSwitched;
 
     // For singleton
     public static ChessBoard Singleton { get; private set; }
-
     private ChessBoardConfiguration chessBoardConfiguration;
+
 
     private void Awake()
     {
@@ -174,7 +175,7 @@ public class ChessBoard : MonoBehaviour
             {
                 if (CanCurrentSelectedPieceMoveHere(currentHover))
                 {
-                    ReplaceHoverPieceWithCurrentSelectedPiece(true);
+                    ReplaceHoverPieceWithCurrentSelectedPiece();
                 }
             }
         }
@@ -224,6 +225,8 @@ public class ChessBoard : MonoBehaviour
         currentSelectedPiece = null;
 
         chessPieces[currentHover.x, currentHover.y].MoveTo(currentHover);
+
+        SwitchTurn();
 
         MoveDeadPieceToDeadList(deadPiece);
     }
@@ -376,6 +379,8 @@ public class ChessBoard : MonoBehaviour
             playerTeam = Team.Blue;
             otherTeam = Team.Red;
         }
+
+        onTurnSwitched?.Invoke();
     }
 
 }
