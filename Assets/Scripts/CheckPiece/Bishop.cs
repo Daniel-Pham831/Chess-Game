@@ -7,17 +7,17 @@ public class Bishop : ChessPiece
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();
 
-        for (int x = currentX - 1; x <= currentX + 1; x++)
+        for (int x = this.currentX - 1; x <= this.currentX + 1; x++)
         {
-            for (int y = currentY - 1; y <= currentY + 1; y++)
+            for (int y = this.currentY - 1; y <= this.currentY + 1; y++)
             {
-                if (x == currentX && y == currentY) continue;
+                if (x == this.currentX && y == this.currentY) continue;
 
                 Vector2Int nextMove = new Vector2Int(x, y);
-                Vector2Int moveDir = nextMove - new Vector2Int(currentX, currentY);
+                Vector2Int moveDir = nextMove - new Vector2Int(this.currentX, this.currentY);
 
                 if (moveDir.x == moveDir.y || moveDir.x + moveDir.y == 0)
-                    AddedMoveRecursivelly(ref allPossibleMoveList, nextMove, moveDir);
+                    this.AddedMoveRecursivelly(ref allPossibleMoveList, nextMove, moveDir);
             }
         }
 

@@ -20,7 +20,7 @@ public class UIManager : MonoBehaviour
     {
         ChessBoard.Singleton.onTurnSwitched += () =>
                 {
-                    currentTurnUI.color = ChessBoard.Singleton.currentTurn == Team.Blue ? blueTeamMaterial.color : redTeamMaterial.color;
+                    this.currentTurnUI.color = ChessBoard.Singleton.currentTurn == Team.Blue ? this.blueTeamMaterial.color : this.redTeamMaterial.color;
                 };
     }
 }

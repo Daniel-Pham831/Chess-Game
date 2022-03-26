@@ -7,19 +7,19 @@ public class Knight : ChessPiece
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();
 
-        for (int x = currentX - 2; x <= currentX + 2; x++)
+        for (int x = this.currentX - 2; x <= this.currentX + 2; x++)
         {
-            for (int y = currentY - 2; y <= currentY + 2; y++)
+            for (int y = this.currentY - 2; y <= this.currentY + 2; y++)
             {
-                if (x == currentX || y == currentY) continue;
+                if (x == this.currentX || y == this.currentY) continue;
 
                 Vector2Int nextMove = new Vector2Int(x, y);
-                Vector2Int moveDir = nextMove - new Vector2Int(currentX, currentY);
+                Vector2Int moveDir = nextMove - new Vector2Int(this.currentX, this.currentY);
 
-                if (IsOutsideTheBoard(nextMove))
+                if (this.IsOutsideTheBoard(nextMove))
                     continue;
 
-                if (IsBeingBlockedByTeamAt(nextMove)) continue;
+                if (this.IsBeingBlockedByTeamAt(nextMove)) continue;
 
                 if (moveDir.x == moveDir.y || moveDir.x + moveDir.y == 0) continue;
 

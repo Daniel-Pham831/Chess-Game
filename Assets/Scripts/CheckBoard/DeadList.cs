@@ -20,17 +20,17 @@ public class DeadList : MonoBehaviour
 
     private void Start()
     {
-        smoothTime = ChessBoardConfiguration.Singleton.smoothTime;
+        this.smoothTime = ChessBoardConfiguration.Singleton.smoothTime;
     }
 
     public void SetupDeadList(Vector3 blueDeadListPosition, Vector3 redDeadListPosition, float tileSize, Vector3 chessBoardForward)
     {
-        blueDeadList = new List<ChessPiece>();
-        redDeadList = new List<ChessPiece>();
+        this.blueDeadList = new List<ChessPiece>();
+        this.redDeadList = new List<ChessPiece>();
 
         this.blueDeadListPosition = blueDeadListPosition;
         this.redDeadListPosition = redDeadListPosition;
-        this.deadTileSize = tileSize * deadSizeMultiplier;
+        this.deadTileSize = tileSize * this.deadSizeMultiplier;
         this.bluePieceForward = chessBoardForward;
         this.redPieceForward = -this.bluePieceForward;
     }
@@ -39,32 +39,32 @@ public class DeadList : MonoBehaviour
     {
         if (deadPiece.team == Team.Blue)
         {
-            blueDeadList.Add(deadPiece);
+            this.blueDeadList.Add(deadPiece);
         }
         else
         {
-            redDeadList.Add(deadPiece);
+            this.redDeadList.Add(deadPiece);
         }
 
-        UpdateDeadListPosition(deadPiece);
+        this.UpdateDeadListPosition(deadPiece);
     }
 
     private void UpdateDeadListPosition(ChessPiece deadPiece)
     {
-        deadPiece.transform.localScale = deadPiece.transform.localScale * deadSizeMultiplier;
+        deadPiece.transform.localScale = deadPiece.transform.localScale * this.deadSizeMultiplier;
 
         Vector3 targetPos = ((deadPiece.team == Team.Blue) ?
-            blueDeadListPosition + bluePieceForward * (blueDeadList.Count - 1) * deadTileSize :
-            redDeadListPosition + redPieceForward * (redDeadList.Count - 1) * deadTileSize);
+            this.blueDeadListPosition + this.bluePieceForward * (this.blueDeadList.Count - 1) * this.deadTileSize :
+            this.redDeadListPosition + this.redPieceForward * (this.redDeadList.Count - 1) * this.deadTileSize);
 
-        StartCoroutine(SmoothUpdateDeadListPosition(deadPiece, targetPos));
+        StartCoroutine(this.SmoothUpdateDeadListPosition(deadPiece, targetPos));
     }
 
     private IEnumerator SmoothUpdateDeadListPosition(ChessPiece deadPiece, Vector3 targetPos)
     {
-        for (float i = 0; i <= smoothTime; i++)
+        for (float i = 0; i <= this.smoothTime; i++)
         {
-            deadPiece.transform.position = Vector3.Lerp(deadPiece.transform.position, targetPos, i / smoothTime);
+            deadPiece.transform.position = Vector3.Lerp(deadPiece.transform.position, targetPos, i / this.smoothTime);
             yield return null;
         }
     }

@@ -10,7 +10,7 @@ public class King : ChessPiece
     {
         base.Awake();
 
-        hasMadeFirstMove = false;
+        this.hasMadeFirstMove = false;
     }
 
     public override void MoveTo(Vector2Int targetMove, bool force = false)
@@ -19,25 +19,25 @@ public class King : ChessPiece
 
         if (force) return;
 
-        if (!hasMadeFirstMove) hasMadeFirstMove = true;
+        if (!this.hasMadeFirstMove) this.hasMadeFirstMove = true;
     }
 
     protected override List<Vector2Int> GetAllPossibleMove()
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();
 
-        for (int x = currentX - 1; x <= currentX + 1; x++)
+        for (int x = this.currentX - 1; x <= this.currentX + 1; x++)
         {
-            for (int y = currentY - 1; y <= currentY + 1; y++)
+            for (int y = this.currentY - 1; y <= this.currentY + 1; y++)
             {
-                if (x == currentX && y == currentY) continue;
+                if (x == this.currentX && y == this.currentY) continue;
 
                 Vector2Int nextMove = new Vector2Int(x, y);
 
-                if (IsOutsideTheBoard(nextMove))
+                if (this.IsOutsideTheBoard(nextMove))
                     continue;
 
-                if (IsBeingBlockedByTeamAt(nextMove)) continue;
+                if (this.IsBeingBlockedByTeamAt(nextMove)) continue;
 
                 allPossibleMoveList.Add(nextMove);
             }

@@ -10,7 +10,7 @@ public class NullPiece : ChessPiece
     {
         base.Awake();
 
-        Reset();
+        this.Reset();
     }
 
     protected override List<Vector2Int> GetAllPossibleMove()
@@ -20,7 +20,7 @@ public class NullPiece : ChessPiece
 
     protected void Reset()
     {
-        isNull = false;
-        isBeingAttacked = false;
+        this.isNull = false;
+        this.isBeingAttacked = false;
     }
 }

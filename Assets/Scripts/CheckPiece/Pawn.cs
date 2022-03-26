@@ -11,7 +11,7 @@ public class Pawn : ChessPiece
     {
         base.Awake();
 
-        hasMadeFirstMove = false;
+        this.hasMadeFirstMove = false;
     }
 
     public override void MoveTo(Vector2Int targetMove, bool force = false)
@@ -20,34 +20,34 @@ public class Pawn : ChessPiece
 
         if (force) return;
 
-        if (!hasMadeFirstMove) hasMadeFirstMove = true;
+        if (!this.hasMadeFirstMove) this.hasMadeFirstMove = true;
     }
 
     protected override List<Vector2Int> GetAllPossibleMove()
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();
-        int teamForward = team == Team.Blue ? 1 : -1;
+        int teamForward = this.team == Team.Blue ? 1 : -1;
 
         Vector2Int forward1, forward2, forwardLeft, forwardRight;
-        if (!hasMadeFirstMove)
+        if (!this.hasMadeFirstMove)
         {
-            forward2 = new Vector2Int(currentX, currentY + 2 * teamForward);
-            if (!IsBeingBlockedAt(forward2))
+            forward2 = new Vector2Int(this.currentX, this.currentY + 2 * teamForward);
+            if (!this.IsBeingBlockedAt(forward2))
                 allPossibleMoveList.Add(forward2);
         }
 
-        forward1 = new Vector2Int(currentX, currentY + 1 * teamForward);
-        if (!IsBeingBlockedAt(forward1))
+        forward1 = new Vector2Int(this.currentX, this.currentY + 1 * teamForward);
+        if (!this.IsBeingBlockedAt(forward1))
             allPossibleMoveList.Add(forward1);
 
-        forwardLeft = new Vector2Int(currentX - 1, currentY + 1 * teamForward);
-        if (IsInsideTheBoard(forwardLeft))
-            if (IsBeingBlockedByOtherTeamAt(forwardLeft))
+        forwardLeft = new Vector2Int(this.currentX - 1, this.currentY + 1 * teamForward);
+        if (this.IsInsideTheBoard(forwardLeft))
+            if (this.IsBeingBlockedByOtherTeamAt(forwardLeft))
                 allPossibleMoveList.Add(forwardLeft);
 
-        forwardRight = new Vector2Int(currentX + 1, currentY + 1 * teamForward);
-        if (IsInsideTheBoard(forwardRight))
-            if (IsBeingBlockedByOtherTeamAt(forwardRight))
+        forwardRight = new Vector2Int(this.currentX + 1, this.currentY + 1 * teamForward);
+        if (this.IsInsideTheBoard(forwardRight))
+            if (this.IsBeingBlockedByOtherTeamAt(forwardRight))
                 allPossibleMoveList.Add(forwardRight);
 
         return allPossibleMoveList;

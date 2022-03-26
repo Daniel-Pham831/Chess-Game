@@ -29,34 +29,34 @@ public abstract class ChessPiece : MonoBehaviour
 
     protected virtual void Awake()
     {
-        validMoveList = new List<Vector2Int>();
+        this.validMoveList = new List<Vector2Int>();
     }
 
     private void Update()
     {
-        if (IsSelected)
-            ChessBoard.Singleton.ShowMovableOf(validMoveList);
+        if (this.IsSelected)
+            ChessBoard.Singleton.ShowMovableOf(this.validMoveList);
     }
 
     public void Select()
     {
-        if (!IsSelected)
+        if (!this.IsSelected)
         {
-            IsSelected = true;
+            this.IsSelected = true;
             UpdateValidMoveList();
         }
         else
         {
-            IsSelected = false;
-            ChessBoard.Singleton.ShowMovableOf(validMoveList, true);
+            this.IsSelected = false;
+            ChessBoard.Singleton.ShowMovableOf(this.validMoveList, true);
         }
 
-        transform.position = new Vector3(transform.position.x, IsSelected ? ySelected : yNormal, transform.position.z);
+        this.transform.position = new Vector3(this.transform.position.x, this.IsSelected ? this.ySelected : this.yNormal, this.transform.position.z);
     }
 
     public bool IsMoveValid(Vector2Int targetMove)
     {
-        foreach (Vector2Int validMove in validMoveList)
+        foreach (Vector2Int validMove in this.validMoveList)
         {
             if (validMove == targetMove) return true;
         }
@@ -66,15 +66,15 @@ public abstract class ChessPiece : MonoBehaviour
 
     public void UpdateValidMoveList()
     {
-        validMoveList = GetAllPossibleMove();
+        this.validMoveList = GetAllPossibleMove();
     }
 
     protected abstract List<Vector2Int> GetAllPossibleMove();
 
     public virtual void MoveTo(Vector2Int targetMove, bool force = false)
     {
-        currentX = targetMove.x;
-        currentY = targetMove.y;
+        this.currentX = targetMove.x;
+        this.currentY = targetMove.y;
 
         Vector3 tileCenter = ChessBoard.Singleton.GetTileCenter(targetMove);
 
@@ -82,7 +82,7 @@ public abstract class ChessPiece : MonoBehaviour
             this.transform.position = tileCenter;
         else
         {
-            StartCoroutine(SmoothPositionASinglePiece(tileCenter));
+            StartCoroutine(this.SmoothPositionASinglePiece(tileCenter));
         }
     }
 
@@ -91,18 +91,18 @@ public abstract class ChessPiece : MonoBehaviour
         int smoothTime = ChessBoardConfiguration.Singleton.smoothTime;
         for (float i = 0; i <= smoothTime; i++)
         {
-            transform.position = Vector3.Lerp(transform.position, targetPos, i / smoothTime);
+            this.transform.position = Vector3.Lerp(this.transform.position, targetPos, i / smoothTime);
             yield return null;
         }
     }
 
     protected virtual void AddedMoveRecursivelly(ref List<Vector2Int> allPossibleMoveList, Vector2Int checkMove, Vector2Int increament)
     {
-        if (IsOutsideTheBoard(checkMove))
+        if (this.IsOutsideTheBoard(checkMove))
             return;
 
-        if (IsBeingBlockedByTeamAt(checkMove)) return;
-        if (IsBeingBlockedByOtherTeamAt(checkMove))
+        if (this.IsBeingBlockedByTeamAt(checkMove)) return;
+        if (this.IsBeingBlockedByOtherTeamAt(checkMove))
         {
             allPossibleMoveList.Add(checkMove);
             return;
@@ -110,7 +110,7 @@ public abstract class ChessPiece : MonoBehaviour
 
         allPossibleMoveList.Add(checkMove);
 
-        AddedMoveRecursivelly(ref allPossibleMoveList, checkMove + increament, increament);
+        this.AddedMoveRecursivelly(ref allPossibleMoveList, checkMove + increament, increament);
     }
 
     protected bool IsOutsideTheBoard(Vector2Int targetMove)
@@ -124,29 +124,29 @@ public abstract class ChessPiece : MonoBehaviour
 
     protected bool IsInsideTheBoard(Vector2Int targetMove)
     {
-        return !IsOutsideTheBoard(targetMove);
+        return !this.IsOutsideTheBoard(targetMove);
     }
 
     protected virtual bool IsBeingBlockedAt(Vector2Int targetMove)
     {
-        if (IsOutsideTheBoard(targetMove)) return true; // If outside the board then count as being blocked
+        if (this.IsOutsideTheBoard(targetMove)) return true; // If outside the board then count as being blocked
 
         return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y] != null ? true : false;
     }
 
     protected virtual bool IsBeingBlockedByTeamAt(Vector2Int targetMove)
     {
-        if (IsOutsideTheBoard(targetMove)) return true;
+        if (this.IsOutsideTheBoard(targetMove)) return true;
 
         return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y] != null ?
-            (ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].team == team ? true : false)
+            (ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].team == this.team ? true : false)
                 : false;
     }
 
     protected virtual bool IsBeingBlockedByOtherTeamAt(Vector2Int targetMove)
     {
         return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y] != null ?
-            (ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].team != team ? true : false)
+            (ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].team != this.team ? true : false)
                 : false;
     }
 }
