@@ -209,7 +209,7 @@ public class ChessBoard : MonoBehaviour
                 if (this.CanCurrentSelectedPieceMoveHere(this.currentHover))
                 {
                     if (this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType == ChessPieceType.King)
-                        this.onTeamVictory?.Invoke(this.currentTurn);
+                        GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)this.currentTurn);
 
                     Debug.Log($"{this.currentSelectedPiece.pieceType.ToString()} killed {this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType.ToString()}");
                     this.ReplaceHoverPieceWithCurrentSelectedPiece(true);

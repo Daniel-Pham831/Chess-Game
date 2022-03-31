@@ -12,8 +12,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Material blueTeamMaterial;
     [SerializeField] private Material redTeamMaterial;
 
-    public event Action OnGameReset;
-
     private void Awake()
     {
         if (Singleton != null)
@@ -27,25 +25,33 @@ public class UIManager : MonoBehaviour
             this.currentTurnUI.color = ChessBoard.Singleton.currentTurn == Team.Blue ? this.blueTeamMaterial.color : this.redTeamMaterial.color;
         };
 
-        ChessBoard.Singleton.onTeamVictory += HandleOnTeamVictory;
-
-        this.OnGameReset += () =>
-        {
-            this.endGameCanvasUI.transform.GetChild(0)?.gameObject.SetActive(true);
-            this.endGameCanvasUI.transform.GetChild(1)?.gameObject.SetActive(true);
-            this.endGameCanvasUI.SetActive(false);
-        };
-
+        GameStateManager.Singleton.OnGameStateChanged += OnGameStateChanged;
     }
 
-    private void HandleOnTeamVictory(Team victoryTeam)
+    private void OnGameStateChanged(GameState state, Turn turn)
+    {
+        switch (state)
+        {
+            case GameState.Victory:
+                this.OnGameVictoryState(turn);
+                break;
+
+            case GameState.Reset:
+                this.OnGameResetState();
+                break;
+        }
+    }
+
+    private void OnGameVictoryState(Turn turn)
     {
         this.endGameCanvasUI.SetActive(true);
-        this.endGameCanvasUI.transform.GetChild((int)victoryTeam)?.gameObject.SetActive(true);
+        this.endGameCanvasUI.transform.GetChild((int)turn)?.gameObject.SetActive(true);
     }
 
-    public void HandleOnGameReset()
+    private void OnGameResetState()
     {
-        this.OnGameReset?.Invoke();
+        this.endGameCanvasUI.transform.GetChild(0)?.gameObject.SetActive(true);
+        this.endGameCanvasUI.transform.GetChild(1)?.gameObject.SetActive(true);
+        this.endGameCanvasUI.SetActive(false);
     }
 }
