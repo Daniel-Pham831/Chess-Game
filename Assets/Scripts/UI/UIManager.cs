@@ -20,12 +20,19 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        ChessBoard.Singleton.onTurnSwitched += () =>
-        {
-            this.currentTurnUI.color = ChessBoard.Singleton.currentTurn == Team.Blue ? this.blueTeamMaterial.color : this.redTeamMaterial.color;
-        };
-
+        ChessBoard.Singleton.onTurnSwitched += OnTurnSwitched;
         GameStateManager.Singleton.OnGameStateChanged += OnGameStateChanged;
+    }
+
+    private void OnDestroy()
+    {
+        ChessBoard.Singleton.onTurnSwitched -= OnTurnSwitched;
+        GameStateManager.Singleton.OnGameStateChanged -= OnGameStateChanged;
+    }
+
+    private void OnTurnSwitched()
+    {
+        this.currentTurnUI.color = ChessBoard.Singleton.currentTurn == Team.Blue ? this.blueTeamMaterial.color : this.redTeamMaterial.color;
     }
 
     private void OnGameStateChanged(GameState state, Turn turn)
@@ -53,5 +60,10 @@ public class UIManager : MonoBehaviour
         this.endGameCanvasUI.transform.GetChild(0)?.gameObject.SetActive(true);
         this.endGameCanvasUI.transform.GetChild(1)?.gameObject.SetActive(true);
         this.endGameCanvasUI.SetActive(false);
+    }
+
+    public void OnResetButton()
+    {
+        GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
     }
 }

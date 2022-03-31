@@ -85,11 +85,51 @@ public class ChessBoard : MonoBehaviour
     {
         this.InitializeValues();
 
-        GenerateAllTiles(this.tileSize, this.TILE_COUNT_X, this.TILE_COUNT_Y);
-        SpawnAllPieces();
-        PositionAllPieces();
+        this.GenerateAllTiles(this.tileSize, this.TILE_COUNT_X, this.TILE_COUNT_Y);
+        this.SpawnAllPieces();
+        this.PositionAllPieces();
 
-        this.deadList.SetupDeadList(GetTileCenter(new Vector2Int(8, -1)), GetTileCenter(new Vector2Int(-1, 8)), this.tileSize, transform.forward);
+        this.deadList.SetupDeadList(GetTileCenter(new Vector2Int(8, -1)), this.GetTileCenter(new Vector2Int(-1, 8)), this.tileSize, transform.forward);
+
+        GameStateManager.Singleton.OnGameStateChanged += this.OnGameStateChanged;
+    }
+
+    private void OnDestroy()
+    {
+        GameStateManager.Singleton.OnGameStateChanged -= this.OnGameStateChanged;
+        this.registerInputEvent(false);
+    }
+
+    private void OnGameStateChanged(GameState state, Turn turn)
+    {
+        switch (state)
+        {
+            case GameState.Reset:
+                this.HandleResetState();
+                break;
+        }
+    }
+
+    private void HandleResetState()
+    {
+        this.currentSelectedPiece = this.nullPiece;
+
+        for (int x = 0; x < this.TILE_COUNT_X; x++)
+        {
+            for (int y = 0; y < this.TILE_COUNT_Y; y++)
+            {
+                Destroy(chessPieces[x, y].gameObject);
+
+                chessPieces[x, y] = null;
+            }
+        }
+
+        this.SpawnAllPieces();
+        this.PositionAllPieces();
+
+        this.currentTurn = Team.Red;
+        this.playerTeam = Team.Red;
+        this.otherTeam = Team.Blue;
     }
 
     private void SetupSingleton()
@@ -163,11 +203,6 @@ public class ChessBoard : MonoBehaviour
             else
                 this.tiles[capturable.x, capturable.y].layer = LayerMask.NameToLayer(this.tileLayer);
         }
-    }
-
-    private void OnDestroy()
-    {
-        this.registerInputEvent(false);
     }
 
     // Input event handler
