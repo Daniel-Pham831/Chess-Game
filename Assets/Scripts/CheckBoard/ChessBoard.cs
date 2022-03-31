@@ -49,6 +49,7 @@ public class ChessBoard : MonoBehaviour
     // For events
     private ChessBoardInputEvent chessBoardInputEvent;
     public event Action onTurnSwitched;
+    public event Action<Team> onTeamVictory;
 
     // For singleton
     public static ChessBoard Singleton { get; private set; }
@@ -207,6 +208,9 @@ public class ChessBoard : MonoBehaviour
 
                 if (this.CanCurrentSelectedPieceMoveHere(this.currentHover))
                 {
+                    if (this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType == ChessPieceType.King)
+                        this.onTeamVictory?.Invoke(this.currentTurn);
+
                     Debug.Log($"{this.currentSelectedPiece.pieceType.ToString()} killed {this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType.ToString()}");
                     this.ReplaceHoverPieceWithCurrentSelectedPiece(true);
 
