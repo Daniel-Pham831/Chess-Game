@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -48,7 +49,7 @@ public class ChessBoard : MonoBehaviour
 
     // For events
     private ChessBoardInputEvent chessBoardInputEvent;
-    public event Action onTurnSwitched;
+    public event Action<Team> onTurnSwitched;
     public event Action<Team> onTeamVictory;
 
     // For singleton
@@ -113,24 +114,22 @@ public class ChessBoard : MonoBehaviour
     private void HandleResetState()
     {
         this.currentSelectedPiece = this.nullPiece;
+        List<ChessPiece> tempChessPieces = this.GetComponentsInChildren<ChessPiece>().ToList();
 
-        for (int x = 0; x < this.TILE_COUNT_X; x++)
+        foreach (ChessPiece piece in tempChessPieces)
         {
-            for (int y = 0; y < this.TILE_COUNT_Y; y++)
-            {
-                ChessPiece tempChessPiece = chessPieces[x, y];
-                chessPieces[x, y] = null;
-
-                Destroy(tempChessPiece.gameObject);
-            }
+            Destroy(piece.gameObject);
         }
 
         this.SpawnAllPieces();
         this.PositionAllPieces();
 
-        this.currentTurn = Team.Red;
-        this.playerTeam = Team.Red;
-        this.otherTeam = Team.Blue;
+
+        this.currentTurn = Team.Blue;
+        this.playerTeam = Team.Blue;
+        this.otherTeam = Team.Red;
+
+        this.onTurnSwitched?.Invoke(this.currentTurn);
     }
 
     private void SetupSingleton()
@@ -453,6 +452,6 @@ public class ChessBoard : MonoBehaviour
             this.otherTeam = Team.Red;
         }
 
-        this.onTurnSwitched?.Invoke();
+        this.onTurnSwitched?.Invoke(this.currentTurn);
     }
 }

@@ -30,9 +30,9 @@ public class UIManager : MonoBehaviour
         GameStateManager.Singleton.OnGameStateChanged -= OnGameStateChanged;
     }
 
-    private void OnTurnSwitched()
+    private void OnTurnSwitched(Team turn)
     {
-        this.currentTurnUI.color = ChessBoard.Singleton.currentTurn == Team.Blue ? this.blueTeamMaterial.color : this.redTeamMaterial.color;
+        this.currentTurnUI.color = turn == Team.Blue ? this.blueTeamMaterial.color : this.redTeamMaterial.color;
     }
 
     private void OnGameStateChanged(GameState state, Turn turn)
@@ -57,8 +57,8 @@ public class UIManager : MonoBehaviour
 
     private void OnGameResetState()
     {
-        this.endGameCanvasUI.transform.GetChild(0)?.gameObject.SetActive(true);
-        this.endGameCanvasUI.transform.GetChild(1)?.gameObject.SetActive(true);
+        this.endGameCanvasUI.transform.GetChild(0)?.gameObject.SetActive(false);
+        this.endGameCanvasUI.transform.GetChild(1)?.gameObject.SetActive(false);
         this.endGameCanvasUI.SetActive(false);
     }
 
