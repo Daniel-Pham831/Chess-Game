@@ -56,7 +56,7 @@ public class ChessBoard : MonoBehaviour
     public static ChessBoard Singleton { get; private set; }
     private ChessBoardConfiguration chessBoardConfiguration;
 
-
+    // Unity functions
     private void Awake()
     {
         this.SetupSingleton();
@@ -81,7 +81,6 @@ public class ChessBoard : MonoBehaviour
 
         this.chessBoardConfiguration = ChessBoardConfiguration.Singleton;
     }
-
     private void Start()
     {
         this.InitializeValues();
@@ -94,13 +93,52 @@ public class ChessBoard : MonoBehaviour
 
         GameStateManager.Singleton.OnGameStateChanged += this.OnGameStateChanged;
     }
-
     private void OnDestroy()
     {
         GameStateManager.Singleton.OnGameStateChanged -= this.OnGameStateChanged;
         this.registerInputEvent(false);
     }
+    private void Update()
+    {
+        if (!this.currentCamera)
+        {
+            this.currentCamera = Camera.main;
+            return;
+        }
 
+        RaycastHit info;
+        Ray ray = this.currentCamera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask(this.layerList.ToArray())))
+        {
+            // Get the indexes of the hit tile
+            Vector2Int hitPosition = this.LookupTileIndex(info.transform.gameObject);
+
+            // If we're hovering a tile after not hovering any tiles
+            if (this.currentHover == -Vector2Int.one)
+            {
+                this.currentHover = hitPosition;
+                this.tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer(this.hoverLayer);
+            }
+
+            // If we were already hovering a tile, change the previous one
+            if (this.currentHover != -Vector2Int.one)
+            {
+                this.tiles[this.currentHover.x, this.currentHover.y].layer = LayerMask.NameToLayer(this.tileLayer);
+                this.currentHover = hitPosition;
+                this.tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer(this.hoverLayer);
+            }
+        }
+        else
+        {
+            if (this.currentHover != -Vector2Int.one)
+            {
+                this.tiles[this.currentHover.x, this.currentHover.y].layer = LayerMask.NameToLayer(this.tileLayer);
+                this.currentHover = -Vector2Int.one;
+            }
+        }
+    }
+
+    // Init-Reset Functions
     private void OnGameStateChanged(GameState state, Turn turn)
     {
         switch (state)
@@ -146,45 +184,7 @@ public class ChessBoard : MonoBehaviour
     }
 
 
-    private void Update()
-    {
-        if (!this.currentCamera)
-        {
-            this.currentCamera = Camera.main;
-            return;
-        }
 
-        RaycastHit info;
-        Ray ray = this.currentCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out info, 100, LayerMask.GetMask(this.layerList.ToArray())))
-        {
-            // Get the indexes of the hit tile
-            Vector2Int hitPosition = this.LookupTileIndex(info.transform.gameObject);
-
-            // If we're hovering a tile after not hovering any tiles
-            if (this.currentHover == -Vector2Int.one)
-            {
-                this.currentHover = hitPosition;
-                this.tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer(this.hoverLayer);
-            }
-
-            // If we were already hovering a tile, change the previous one
-            if (this.currentHover != -Vector2Int.one)
-            {
-                this.tiles[this.currentHover.x, this.currentHover.y].layer = LayerMask.NameToLayer(this.tileLayer);
-                this.currentHover = hitPosition;
-                this.tiles[hitPosition.x, hitPosition.y].layer = LayerMask.NameToLayer(this.hoverLayer);
-            }
-        }
-        else
-        {
-            if (this.currentHover != -Vector2Int.one)
-            {
-                this.tiles[this.currentHover.x, this.currentHover.y].layer = LayerMask.NameToLayer(this.tileLayer);
-                this.currentHover = -Vector2Int.one;
-            }
-        }
-    }
 
     public void ShowMovableOf(List<Vector2Int> movableList, List<Vector2Int> capturableList, bool reset = false)
     {
@@ -206,6 +206,17 @@ public class ChessBoard : MonoBehaviour
     }
 
     // Input event handler
+    private void registerInputEvent(bool confirm)
+    {
+        if (confirm)
+        {
+            this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
+        }
+        else
+        {
+            this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
+        }
+    }
     private void OnLeftMouseButtonDown()
     {
         // If this is not our turn
@@ -270,6 +281,7 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
+    // For Handling chess piece movement of the chess board
     private void ReplaceHoverPieceWithCurrentSelectedPiece(bool killConfirm = false)
     {
         this.currentSelectedPiece.Select();
@@ -288,29 +300,32 @@ public class ChessBoard : MonoBehaviour
 
         this.MoveDeadPieceToDeadList(deadPiece);
     }
-
     private void MoveDeadPieceToDeadList(ChessPiece deadPiece)
     {
         if (deadPiece.IsNull) return;
 
         this.deadList.AddPieceToDeadList(deadPiece);
     }
-
     private bool CanCurrentSelectedPieceMoveHere(Vector2Int currentHover)
     {
         return this.chessPieces[this.currentSelectedPiece.currentX, this.currentSelectedPiece.currentY].IsMoveValid(currentHover);
     }
-
-    private void registerInputEvent(bool confirm)
+    public void SwitchTurn()
     {
-        if (confirm)
+        if (this.currentTurn == Team.Blue)
         {
-            this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
+            this.currentTurn = Team.Red;
+            this.playerTeam = Team.Red;
+            this.otherTeam = Team.Blue;
         }
         else
         {
-            this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
+            this.currentTurn = Team.Blue;
+            this.playerTeam = Team.Blue;
+            this.otherTeam = Team.Red;
         }
+
+        this.onTurnSwitched?.Invoke(this.currentTurn);
     }
 
     // Generate the board
@@ -420,7 +435,6 @@ public class ChessBoard : MonoBehaviour
                 this.chessPieces[x, y].ySelected = this.chessPieces[x, y].transform.position.y * 2f;
             }
     }
-
     public Vector3 GetTileCenter(Vector2Int position)
     {
         return new Vector3(position.x * this.tileSize, this.yOffset, position.y * this.tileSize) - this.bounds + new Vector3(this.tileSize / 2, 0, this.tileSize / 2);
@@ -435,23 +449,5 @@ public class ChessBoard : MonoBehaviour
                     return new Vector2Int(x, y);
 
         return -Vector2Int.one;
-    }
-
-    public void SwitchTurn()
-    {
-        if (this.currentTurn == Team.Blue)
-        {
-            this.currentTurn = Team.Red;
-            this.playerTeam = Team.Red;
-            this.otherTeam = Team.Blue;
-        }
-        else
-        {
-            this.currentTurn = Team.Blue;
-            this.playerTeam = Team.Blue;
-            this.otherTeam = Team.Red;
-        }
-
-        this.onTurnSwitched?.Invoke(this.currentTurn);
     }
 }

@@ -151,6 +151,7 @@ public abstract class ChessPiece : MonoBehaviour
         this.AddedMoveRecursivelly(ref allPossibleMoveList, ref capturableMoveList, checkMove + increament, increament);
     }
 
+    // For Checking Valid Position Logics
     protected bool IsOutsideTheBoard(Vector2Int targetMove)
     {
         if (targetMove.x >= ChessBoardConfiguration.Singleton.TILE_COUNT_X || targetMove.x < 0
@@ -159,19 +160,16 @@ public abstract class ChessPiece : MonoBehaviour
 
         return false;
     }
-
     protected bool IsInsideTheBoard(Vector2Int targetMove)
     {
         return !this.IsOutsideTheBoard(targetMove);
     }
-
     protected virtual bool IsBeingBlockedAt(Vector2Int targetMove)
     {
         if (this.IsOutsideTheBoard(targetMove)) return true; // If outside the board then count as being blocked
 
         return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].IsNotNull ? true : false;
     }
-
     protected virtual bool IsBeingBlockedByTeamAt(Vector2Int targetMove)
     {
         if (this.IsOutsideTheBoard(targetMove)) return true;
@@ -180,7 +178,6 @@ public abstract class ChessPiece : MonoBehaviour
             (ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].team == this.team ? true : false)
                 : false;
     }
-
     protected virtual bool IsBeingBlockedByOtherTeamAt(Vector2Int targetMove)
     {
         return ChessBoard.Singleton.chessPieces[targetMove.x, targetMove.y].IsNotNull ?
