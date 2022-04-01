@@ -118,9 +118,10 @@ public class ChessBoard : MonoBehaviour
         {
             for (int y = 0; y < this.TILE_COUNT_Y; y++)
             {
-                Destroy(chessPieces[x, y].gameObject);
-
+                ChessPiece tempChessPiece = chessPieces[x, y];
                 chessPieces[x, y] = null;
+
+                Destroy(tempChessPiece.gameObject);
             }
         }
 

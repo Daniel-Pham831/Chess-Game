@@ -1185,7 +1185,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1346872330}
         m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
-        m_MethodName: HandleOnGameReset
+        m_MethodName: OnResetButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

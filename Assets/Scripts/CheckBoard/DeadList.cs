@@ -37,11 +37,11 @@ public class DeadList : MonoBehaviour
 
     private void HandleResetState()
     {
-        this.ResetDeadList(ref this.blueDeadList);
-        this.ResetDeadList(ref this.redDeadList);
+        // this.ResetDeadList(this.blueDeadList);
+        //  this.ResetDeadList(this.redDeadList);
     }
 
-    private void ResetDeadList(ref List<ChessPiece> deadList)
+    private void ResetDeadList(List<ChessPiece> deadList)
     {
         foreach (ChessPiece piece in deadList)
         {
@@ -49,6 +49,8 @@ public class DeadList : MonoBehaviour
             deadList.Remove(piece);
             Destroy(temp.gameObject);
         }
+
+        Debug.Log(deadList.Count);
     }
 
     public void SetupDeadList(Vector3 blueDeadListPosition, Vector3 redDeadListPosition, float tileSize, Vector3 chessBoardForward)
