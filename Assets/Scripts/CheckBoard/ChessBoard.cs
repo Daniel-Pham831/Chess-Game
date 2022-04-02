@@ -262,8 +262,6 @@ public class ChessBoard : MonoBehaviour
 
                     return;
                 }
-                else
-                    Debug.Log($"{this.currentSelectedPiece.pieceType.ToString()} Cannot kill {this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType.ToString()}");
             }
             else
             {
