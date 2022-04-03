@@ -82,7 +82,7 @@ public class Client : MonoBehaviour
                     break;
 
                 case NetworkEvent.Type.Data:
-                    // NetUtility.OnData(stream,default(NetworkConnection));
+                    NetUtility.OnData(stream, default(NetworkConnection));
                     break;
 
                 case NetworkEvent.Type.Disconnect:
@@ -99,18 +99,18 @@ public class Client : MonoBehaviour
     {
         DataStreamWriter writer;
         driver.BeginSend(this.connection, out writer);
-        // msg.Serialize(ref writer);
+        msg.Serialize(ref writer);
         this.driver.EndSend(writer);
     }
 
     // Event parsing
     private void RegisterToEvent()
     {
-        // NetUtility.C_KEEP_ALIVE += this.OnKeepAlive;
+        NetUtility.C_KEEP_ALIVE += this.OnKeepAlive;
     }
     private void UnregisterToEvent()
     {
-        // NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
+        NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
     }
     private void OnKeepAlive(NetMessage nm)
     {

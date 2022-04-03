@@ -59,7 +59,7 @@ public class Server : MonoBehaviour
     {
         if (!this.isActive) return;
 
-        // this.KeepAlive();
+        //this.KeepAlive();
 
         this.driver.ScheduleUpdate().Complete();
 
@@ -96,7 +96,7 @@ public class Server : MonoBehaviour
             {
                 if (cmd == NetworkEvent.Type.Data)
                 {
-                    // Still not having implementation here
+                    NetUtility.OnData(stream, this.connections[i], this);
                 }
                 else if (cmd == NetworkEvent.Type.Disconnect)
                 {
@@ -119,7 +119,7 @@ public class Server : MonoBehaviour
     {
         DataStreamWriter writer;
         this.driver.BeginSend(connection, out writer);
-        // msg.Serialize(ref writer);
+        msg.Serialize(ref writer);
         this.driver.EndSend(writer);
     }
     public void BroadCast(NetMessage msg)
@@ -128,7 +128,7 @@ public class Server : MonoBehaviour
         {
             if (this.connections[i].IsCreated)
             {
-                // Debug.Log($"Sending {msg.Code} to: {this.connections[i].InternalId}");
+                Debug.Log($"Sending {msg.Code} to: {this.connections[i].InternalId}");
                 this.SendToClient(this.connections[i], msg);
             }
         }
