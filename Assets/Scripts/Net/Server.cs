@@ -15,7 +15,7 @@ public class Server : MonoBehaviour
     private NativeList<NetworkConnection> connections;
 
     private bool isActive = false;
-    private const float keepAliveTickRate = 20f;
+    private float keepAliveTickRate = 20f;
     private float lastKeepAlive;
 
     public Action connectionDropped;
@@ -59,7 +59,7 @@ public class Server : MonoBehaviour
     {
         if (!this.isActive) return;
 
-        //this.KeepAlive();
+        this.KeepAlive();
 
         this.driver.ScheduleUpdate().Complete();
 
@@ -67,6 +67,16 @@ public class Server : MonoBehaviour
         this.AcceptNewConnections();
         this.UpdateMessagePump();
     }
+
+    private void KeepAlive()
+    {
+        if (Time.time - this.lastKeepAlive > this.keepAliveTickRate)
+        {
+            this.lastKeepAlive = Time.time;
+            this.BroadCast(new NetKeepAlive());
+        }
+    }
+
     private void CleanupConnections()
     {
         for (int i = 0; i < this.connections.Length; i++)
