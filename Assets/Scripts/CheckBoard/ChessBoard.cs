@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Networking.Transport;
 
 public enum Team
 {
@@ -37,6 +38,10 @@ public class ChessBoard : MonoBehaviour
     public Team playerTeam;
     public Team otherTeam;
 
+    // Multi logics
+    private int playerCount = -1;
+    private int currentTeam = -1;
+
     // For generateAllTiles
     private float tileSize;
     private float yOffset;
@@ -62,7 +67,7 @@ public class ChessBoard : MonoBehaviour
         this.SetupSingleton();
 
         this.chessBoardInputEvent = GetComponent<ChessBoardInputEvent>();
-        registerInputEvent(true);
+        registerEvents(true);
 
         this.currentTurn = Team.Blue;
         this.playerTeam = Team.Blue;
@@ -96,7 +101,7 @@ public class ChessBoard : MonoBehaviour
     private void OnDestroy()
     {
         GameStateManager.Singleton.OnGameStateChanged -= this.OnGameStateChanged;
-        this.registerInputEvent(false);
+        this.registerEvents(false);
     }
     private void Update()
     {
@@ -205,18 +210,7 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
-    // Input event handler
-    private void registerInputEvent(bool confirm)
-    {
-        if (confirm)
-        {
-            this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
-        }
-        else
-        {
-            this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
-        }
-    }
+
     private void OnLeftMouseButtonDown()
     {
         // If this is not our turn
@@ -447,5 +441,45 @@ public class ChessBoard : MonoBehaviour
                     return new Vector2Int(x, y);
 
         return -Vector2Int.one;
+    }
+
+    // Input event handler
+    // confirm means subscript
+    private void registerEvents(bool confirm)
+    {
+        if (confirm)
+        {
+            this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
+            NetUtility.S_WELCOME += this.OnWelcomeServer;
+            NetUtility.C_WELCOME += this.OnWelcomeClient;
+        }
+        else
+        {
+            this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
+            NetUtility.S_WELCOME -= this.OnWelcomeServer;
+            NetUtility.C_WELCOME -= this.OnWelcomeClient;
+        }
+    }
+
+    // Server
+    private void OnWelcomeServer(NetMessage message, NetworkConnection connectedClient)
+    {
+        // At this point, there is a client has connected to the server
+        // We need to assign a team and return the message back to that client
+        NetWelcome netWelcome = message as NetWelcome;
+
+        netWelcome.AssignedTeam = ++this.playerCount;
+
+        Server.Singleton.SendToClient(connectedClient, netWelcome);
+    }
+
+    //Client
+    private void OnWelcomeClient(NetMessage message)
+    {
+        NetWelcome netWelcome = message as NetWelcome;
+
+        this.currentTeam = netWelcome.AssignedTeam;
+
+        Debug.Log($"My team is {this.currentTeam}");
     }
 }

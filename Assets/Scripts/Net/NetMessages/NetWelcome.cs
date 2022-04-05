@@ -10,7 +10,7 @@ public class NetWelcome : NetMessage
 
     public NetWelcome(DataStreamReader reader)
     {
-        this.Code = OpCode.KEEP_ALIVE;
+        this.Code = OpCode.WELCOME;
         this.Deserialize(reader);
     }
 
