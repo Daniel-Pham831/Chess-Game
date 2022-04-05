@@ -78,7 +78,7 @@ public class Client : MonoBehaviour
             switch (cmd)
             {
                 case NetworkEvent.Type.Connect:
-                    // this.SendToServer(new NetWelcome());
+                    this.SendToServer(new NetWelcome());
                     Debug.Log("Connected");
                     break;
 

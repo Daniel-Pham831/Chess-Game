@@ -1,14 +1,14 @@
 using Unity.Networking.Transport;
 
-public class NetKeepAlive : NetMessage
+public class NetWelcome : NetMessage
 {
-
-
-    public NetKeepAlive()
+    public int AssignedTeam { set; get; }
+    public NetWelcome()
     {
-        this.Code = OpCode.KEEP_ALIVE;
+        this.Code = OpCode.WELCOME;
     }
-    public NetKeepAlive(DataStreamReader reader)
+
+    public NetWelcome(DataStreamReader reader)
     {
         this.Code = OpCode.KEEP_ALIVE;
         this.Deserialize(reader);
@@ -17,24 +17,24 @@ public class NetKeepAlive : NetMessage
     public override void Serialize(ref DataStreamWriter writer)
     {
         writer.WriteByte((byte)this.Code);
+        writer.WriteInt(this.AssignedTeam);
     }
 
     public override void Deserialize(DataStreamReader reader)
     {
-
+        this.AssignedTeam = reader.ReadInt();
     }
 
     public override void ReceivedOnClient()
     {
         base.ReceivedOnClient();
 
-        NetUtility.C_KEEP_ALIVE?.Invoke(this);
+        NetUtility.C_WELCOME?.Invoke(this);
     }
     public override void ReceivedOnServer(NetworkConnection cnn)
     {
         base.ReceivedOnServer(cnn);
 
-        NetUtility.S_KEEP_ALIVE?.Invoke(this, cnn);
-
+        NetUtility.S_WELCOME?.Invoke(this, cnn);
     }
 }
