@@ -113,9 +113,9 @@ public class Client : MonoBehaviour
     {
         NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
     }
-    private void OnKeepAlive(NetMessage nm)
+    private void OnKeepAlive(NetMessage keepAliveMessage)
     {
         // Send it back, to keep both side alive
-        this.SendToServer(nm);
+        this.SendToServer(keepAliveMessage);
     }
 }
