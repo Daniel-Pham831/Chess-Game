@@ -9,8 +9,9 @@ public class NetMessage
 
     public virtual void Serialize(ref DataStreamWriter writer)
     {
-        writer.WriteByte((byte)Code);
+        writer.WriteByte((byte)this.Code);
     }
+
     public virtual void Deserialize(DataStreamReader reader)
     {
 
