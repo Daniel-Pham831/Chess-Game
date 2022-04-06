@@ -98,27 +98,29 @@ public class Server : MonoBehaviour
     }
     private void UpdateMessagePump()
     {
-        DataStreamReader stream;
+        DataStreamReader streamReader;
         for (int i = 0; i < this.connections.Length; i++)
         {
             NetworkEvent.Type cmd;
-            while ((cmd = this.driver.PopEventForConnection(this.connections[i], out stream)) != NetworkEvent.Type.Empty)
+            while ((cmd = this.driver.PopEventForConnection(this.connections[i], out streamReader)) != NetworkEvent.Type.Empty)
             {
-                if (cmd == NetworkEvent.Type.Data)
+                switch (cmd)
                 {
-                    NetUtility.OnData(stream, this.connections[i], this);
-                }
-                else if (cmd == NetworkEvent.Type.Disconnect)
-                {
-                    Debug.Log("Client disconnected from the server");
-                    this.connections[i] = default(NetworkConnection);
-                    this.connectionDropped?.Invoke();
+                    case NetworkEvent.Type.Data:
+                        NetUtility.OnData(streamReader, default(NetworkConnection));
+                        break;
 
-                    /*
-                     *  Shut down the server when 1 of the 2 players disconnect
-                     *  Because this is a chess game. It needs 2 people to play
-                     */
-                    this.Shutdown();
+                    case NetworkEvent.Type.Disconnect:
+                        Debug.Log("Client disconnected from the server");
+                        this.connections[i] = default(NetworkConnection);
+                        this.connectionDropped?.Invoke();
+
+                        /*
+                         *  Shut down the server when 1 of the 2 players disconnect
+                         *  Because this is a chess game. It needs 2 people to play
+                         */
+                        this.Shutdown();
+                        break;
                 }
             }
         }

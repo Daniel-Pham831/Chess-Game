@@ -99,7 +99,7 @@ public class Client : MonoBehaviour
     public void SendToServer(NetMessage msg)
     {
         DataStreamWriter writer;
-        driver.BeginSend(this.connection, out writer);
+        this.driver.BeginSend(this.connection, out writer);
         msg.Serialize(ref writer);
         this.driver.EndSend(writer);
     }
