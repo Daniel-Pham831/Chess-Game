@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -17,6 +18,18 @@ public class MenuUIManager : MonoBehaviour
     {
         if (Singleton != null)
             Singleton = this;
+
+        this.registerEvents(true);
+    }
+
+    private void OnDestroy()
+    {
+        this.registerEvents(false);
+    }
+
+    private void onGameStart()
+    {
+        menuUIAnim.SetTrigger("InGameUI");
     }
 
     public void OnLocalGameBtnClicked()
@@ -59,5 +72,17 @@ public class MenuUIManager : MonoBehaviour
 
         server.Shutdown();
         client.Shutdown();
+    }
+
+    private void registerEvents(bool confirm)
+    {
+        if (confirm)
+        {
+            ChessBoard.Singleton.onGameStart += onGameStart;
+        }
+        else
+        {
+            ChessBoard.Singleton.onGameStart -= onGameStart;
+        }
     }
 }

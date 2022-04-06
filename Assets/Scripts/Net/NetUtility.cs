@@ -39,9 +39,9 @@ public static class NetUtility
                 msg = new NetWelcome(stream);
                 break;
 
-            // case OpCode.START_GAME:
-            //     msg = new NetStartGame(stream);
-            //     break;
+            case OpCode.START_GAME:
+                msg = new NetStartGame(stream);
+                break;
 
             // case OpCode.MAKE_MOVE:
             //     msg = new NetMakeMove(stream);

@@ -56,6 +56,7 @@ public class ChessBoard : MonoBehaviour
     private ChessBoardInputEvent chessBoardInputEvent;
     public event Action<Team> onTurnSwitched;
     public event Action<Team> onTeamVictory;
+    public event Action onGameStart;
 
     // For singleton
     public static ChessBoard Singleton { get; private set; }
@@ -452,12 +453,14 @@ public class ChessBoard : MonoBehaviour
             this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
             NetUtility.S_WELCOME += this.OnWelcomeServer;
             NetUtility.C_WELCOME += this.OnWelcomeClient;
+            NetUtility.C_START_GAME += this.OnStartGameClient;
         }
         else
         {
             this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
             NetUtility.S_WELCOME -= this.OnWelcomeServer;
             NetUtility.C_WELCOME -= this.OnWelcomeClient;
+            NetUtility.C_START_GAME -= this.OnStartGameClient;
         }
     }
 
@@ -471,6 +474,9 @@ public class ChessBoard : MonoBehaviour
         netWelcome.AssignedTeam = ++this.playerCount;
 
         Server.Singleton.SendToClient(connectedClient, netWelcome);
+
+        if (this.playerCount == 1)
+            Server.Singleton.BroadCast(new NetStartGame());
     }
 
     //Client
@@ -481,5 +487,10 @@ public class ChessBoard : MonoBehaviour
         this.currentTeam = netWelcome.AssignedTeam;
 
         Debug.Log($"My team is {this.currentTeam}");
+    }
+
+    private void OnStartGameClient(NetMessage obj)
+    {
+        this.onGameStart?.Invoke();
     }
 }
