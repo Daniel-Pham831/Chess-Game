@@ -447,6 +447,7 @@ public class ChessBoard : MonoBehaviour
             NetUtility.S_WELCOME += this.OnWelcomeServer;
             NetUtility.C_WELCOME += this.OnWelcomeClient;
             NetUtility.C_START_GAME += this.OnStartGameClient;
+            NetUtility.C_PIECE_SELECTED += this.OnPieceSelected;
         }
         else
         {
@@ -454,8 +455,11 @@ public class ChessBoard : MonoBehaviour
             NetUtility.S_WELCOME -= this.OnWelcomeServer;
             NetUtility.C_WELCOME -= this.OnWelcomeClient;
             NetUtility.C_START_GAME -= this.OnStartGameClient;
+            NetUtility.C_PIECE_SELECTED -= this.OnPieceSelected;
         }
     }
+
+
 
     // Server
     private void OnWelcomeServer(NetMessage message, NetworkConnection connectedClient)
@@ -491,5 +495,12 @@ public class ChessBoard : MonoBehaviour
     private void OnStartGameClient(NetMessage message)
     {
         this.onGameStart?.Invoke(this.currentTeam);
+    }
+
+    private void OnPieceSelected(NetMessage message)
+    {
+        NetPieceSelected netPieceSelected = message as NetPieceSelected;
+
+        this.chessPieces[netPieceSelected.currentX, netPieceSelected.currentY].SelectClient();
     }
 }

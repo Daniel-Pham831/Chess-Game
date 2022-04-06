@@ -53,6 +53,11 @@ public abstract class ChessPiece : MonoBehaviour
 
     public void Select()
     {
+        Server.Singleton.BroadCast(new NetPieceSelected(this.currentX, this.currentY));
+    }
+
+    public void SelectClient()
+    {
         if (!this.IsSelected)
         {
             this.IsSelected = true;
