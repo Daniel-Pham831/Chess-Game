@@ -36,7 +36,6 @@ public class ChessBoard : MonoBehaviour
     // Player Turn
     public Team currentTurn;
     public Team playerTeam;
-    public Team otherTeam;
 
     // Multi logics
     private int playerCount = -1;
@@ -72,7 +71,6 @@ public class ChessBoard : MonoBehaviour
 
         this.currentTurn = Team.Blue;
         this.playerTeam = Team.Blue;
-        this.otherTeam = Team.Red;
 
         this.nullPiece = this.SpawnNullPiece();
         this.currentSelectedPiece = this.nullPiece;
@@ -168,10 +166,7 @@ public class ChessBoard : MonoBehaviour
         this.SpawnAllPieces();
         this.PositionAllPieces();
 
-
         this.currentTurn = Team.Blue;
-        this.playerTeam = Team.Blue;
-        this.otherTeam = Team.Red;
 
         this.onTurnSwitched?.Invoke(this.currentTurn);
     }
@@ -215,7 +210,7 @@ public class ChessBoard : MonoBehaviour
     private void OnLeftMouseButtonDown()
     {
         // If this is not our turn
-        if (this.currentTurn != this.playerTeam) return;
+        if (this.currentTurn != this.currentTeam) return;
 
         // If the select outside of the board
         if (this.currentHover == -Vector2Int.one)
@@ -242,15 +237,15 @@ public class ChessBoard : MonoBehaviour
         }
         else
         {
-            // If chessPiece at currentHover is not our piece
-            if (this.chessPieces[this.currentHover.x, this.currentHover.y].team != this.playerTeam)
+            // If chessPiece at currentHover is not our team piece
+            if (this.chessPieces[this.currentHover.x, this.currentHover.y].team != this.currentTeam)
             {
                 if (this.currentSelectedPiece.IsNull) return;
 
                 if (this.CanCurrentSelectedPieceMoveHere(this.currentHover))
                 {
                     if (this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType == ChessPieceType.King)
-                        GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)this.currentTurn);
+                        GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)this.currentTeam);
 
                     Debug.Log($"{this.currentSelectedPiece.pieceType.ToString()} killed {this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType.ToString()}");
                     this.ReplaceHoverPieceWithCurrentSelectedPiece(true);
@@ -309,13 +304,11 @@ public class ChessBoard : MonoBehaviour
         {
             this.currentTurn = Team.Red;
             this.playerTeam = Team.Red;
-            this.otherTeam = Team.Blue;
         }
         else
         {
             this.currentTurn = Team.Blue;
             this.playerTeam = Team.Blue;
-            this.otherTeam = Team.Red;
         }
 
         this.onTurnSwitched?.Invoke(this.currentTurn);
@@ -490,6 +483,7 @@ public class ChessBoard : MonoBehaviour
         NetWelcome netWelcome = message as NetWelcome;
 
         this.currentTeam = netWelcome.AssignedTeam;
+        this.playerTeam = this.currentTeam;
 
         Debug.Log($"My team is {this.currentTeam}");
     }

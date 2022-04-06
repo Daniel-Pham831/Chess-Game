@@ -9,6 +9,7 @@ public enum GameState
     Victory,
     Reset
 }
+
 public enum Turn
 {
     Player,
@@ -33,7 +34,6 @@ public class GameStateManager : MonoBehaviour
     private void Start()
     {
         this.UpdateGameState(GameState.Play, Turn.Player);
-
     }
 
     private void UpdateCurrentTurn(Turn turn)
