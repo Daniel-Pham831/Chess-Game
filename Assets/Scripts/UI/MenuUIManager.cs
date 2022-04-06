@@ -27,7 +27,7 @@ public class MenuUIManager : MonoBehaviour
         this.registerEvents(false);
     }
 
-    private void onGameStart(int team)
+    private void onGameStart(Team team)
     {
         menuUIAnim.SetTrigger("InGameUI");
     }

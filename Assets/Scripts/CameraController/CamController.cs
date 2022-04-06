@@ -35,13 +35,13 @@ public class CamController : MonoBehaviour
         }
     }
 
-    private void onGameStart(int team)
+    private void onGameStart(Team team)
     {
         foreach (GameObject camera in cameras)
         {
             camera.SetActive(false);
         }
 
-        cameras[team].SetActive(true);
+        cameras[(int)team + 1].SetActive(true);
     }
 }

@@ -40,7 +40,7 @@ public class ChessBoard : MonoBehaviour
 
     // Multi logics
     private int playerCount = -1;
-    private int currentTeam = -1;
+    private Team currentTeam;
 
     // For generateAllTiles
     private float tileSize;
@@ -56,7 +56,7 @@ public class ChessBoard : MonoBehaviour
     private ChessBoardInputEvent chessBoardInputEvent;
     public event Action<Team> onTurnSwitched;
     public event Action<Team> onTeamVictory;
-    public event Action<int> onGameStart;
+    public event Action<Team> onGameStart;
 
     // For singleton
     public static ChessBoard Singleton { get; private set; }
@@ -471,12 +471,17 @@ public class ChessBoard : MonoBehaviour
         // We need to assign a team and return the message back to that client
         NetWelcome netWelcome = message as NetWelcome;
 
-        netWelcome.AssignedTeam = ++this.playerCount;
+        netWelcome.AssignedTeam = AssignTeamToClient(++this.playerCount);
 
         Server.Singleton.SendToClient(connectedClient, netWelcome);
 
         if (this.playerCount == 1)
             Server.Singleton.BroadCast(new NetStartGame());
+    }
+
+    private Team AssignTeamToClient(int currentTotalUser)
+    {
+        return currentTotalUser == 0 ? Team.Blue : Team.Red;
     }
 
     //Client
@@ -491,6 +496,6 @@ public class ChessBoard : MonoBehaviour
 
     private void OnStartGameClient(NetMessage message)
     {
-        this.onGameStart?.Invoke(this.currentTeam + 1);
+        this.onGameStart?.Invoke(this.currentTeam);
     }
 }

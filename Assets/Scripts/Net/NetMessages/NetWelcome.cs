@@ -2,7 +2,7 @@ using Unity.Networking.Transport;
 
 public class NetWelcome : NetMessage
 {
-    public int AssignedTeam { set; get; }
+    public Team AssignedTeam { set; get; }
     public NetWelcome()
     {
         this.Code = OpCode.WELCOME;
@@ -17,12 +17,12 @@ public class NetWelcome : NetMessage
     public override void Serialize(ref DataStreamWriter writer)
     {
         writer.WriteByte((byte)this.Code);
-        writer.WriteInt(this.AssignedTeam);
+        writer.WriteInt((int)this.AssignedTeam);
     }
 
     public override void Deserialize(DataStreamReader reader)
     {
-        this.AssignedTeam = reader.ReadInt();
+        this.AssignedTeam = (Team)reader.ReadInt();
     }
 
     public override void ReceivedOnClient()
