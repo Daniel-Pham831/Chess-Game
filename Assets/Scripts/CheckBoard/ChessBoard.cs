@@ -231,7 +231,7 @@ public class ChessBoard : MonoBehaviour
             {
                 if (this.CanCurrentSelectedPieceMoveHere(this.currentHover))
                 {
-                    this.ReplaceHoverPieceWithCurrentSelectedPiece();
+                    this.SendMovePieceToServer();
                 }
             }
         }
@@ -248,7 +248,8 @@ public class ChessBoard : MonoBehaviour
                         GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)this.currentTeam);
 
                     Debug.Log($"{this.currentSelectedPiece.pieceType.ToString()} killed {this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType.ToString()}");
-                    this.ReplaceHoverPieceWithCurrentSelectedPiece(true);
+
+                    this.SendMovePieceToServer(KillConfirm.Kill);
 
                     return;
                 }
@@ -269,13 +270,18 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
-    // For Handling chess piece movement of the chess board
-    private void ReplaceHoverPieceWithCurrentSelectedPiece(bool killConfirm = false)
+    private void SendMovePieceToServer(KillConfirm killConfirm = KillConfirm.Move)
     {
-        this.currentSelectedPiece.Select();
+        Server.Singleton.BroadCast(new NetMakeMove(this.currentHover.x, this.currentHover.y, killConfirm));
+    }
+
+    // For Handling chess piece movement of the chess board
+    private void ReplaceHoverPieceWithCurrentSelectedPiece(KillConfirm killConfirm = KillConfirm.Move)
+    {
+        this.currentSelectedPiece.SelectClient();
 
         ChessPiece tempChessPiece = this.currentSelectedPiece;
-        ChessPiece deadPiece = killConfirm ? this.chessPieces[this.currentHover.x, this.currentHover.y] : this.nullPiece;
+        ChessPiece deadPiece = killConfirm == KillConfirm.Kill ? this.chessPieces[this.currentHover.x, this.currentHover.y] : this.nullPiece;
 
         this.chessPieces[this.currentHover.x, this.currentHover.y] = this.currentSelectedPiece;
         this.chessPieces[tempChessPiece.currentX, tempChessPiece.currentY] = this.nullPiece;
@@ -303,12 +309,10 @@ public class ChessBoard : MonoBehaviour
         if (this.currentTurn == Team.Blue)
         {
             this.currentTurn = Team.Red;
-            this.playerTeam = Team.Red;
         }
         else
         {
             this.currentTurn = Team.Blue;
-            this.playerTeam = Team.Blue;
         }
 
         this.onTurnSwitched?.Invoke(this.currentTurn);
@@ -447,7 +451,8 @@ public class ChessBoard : MonoBehaviour
             NetUtility.S_WELCOME += this.OnWelcomeServer;
             NetUtility.C_WELCOME += this.OnWelcomeClient;
             NetUtility.C_START_GAME += this.OnStartGameClient;
-            NetUtility.C_PIECE_SELECTED += this.OnPieceSelected;
+            NetUtility.C_PIECE_SELECTED += this.OnPieceSelectedClient;
+            NetUtility.C_MAKE_MOVE += this.OnMakeMoveClient;
         }
         else
         {
@@ -455,9 +460,12 @@ public class ChessBoard : MonoBehaviour
             NetUtility.S_WELCOME -= this.OnWelcomeServer;
             NetUtility.C_WELCOME -= this.OnWelcomeClient;
             NetUtility.C_START_GAME -= this.OnStartGameClient;
-            NetUtility.C_PIECE_SELECTED -= this.OnPieceSelected;
+            NetUtility.C_PIECE_SELECTED -= this.OnPieceSelectedClient;
+            NetUtility.C_MAKE_MOVE -= this.OnMakeMoveClient;
         }
     }
+
+
 
 
 
@@ -497,10 +505,21 @@ public class ChessBoard : MonoBehaviour
         this.onGameStart?.Invoke(this.currentTeam);
     }
 
-    private void OnPieceSelected(NetMessage message)
+    private void OnPieceSelectedClient(NetMessage message)
     {
         NetPieceSelected netPieceSelected = message as NetPieceSelected;
 
-        this.chessPieces[netPieceSelected.currentX, netPieceSelected.currentY].SelectClient();
+        this.currentSelectedPiece = this.chessPieces[netPieceSelected.currentX, netPieceSelected.currentY];
+        this.currentSelectedPiece.SelectClient();
+    }
+
+    private void OnMakeMoveClient(NetMessage message)
+    {
+        NetMakeMove netMakeMove = message as NetMakeMove;
+
+        this.currentHover.x = netMakeMove.NextX;
+        this.currentHover.y = netMakeMove.NextY;
+
+        this.ReplaceHoverPieceWithCurrentSelectedPiece(netMakeMove.killConfirm);
     }
 }

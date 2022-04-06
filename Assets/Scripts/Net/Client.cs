@@ -70,10 +70,10 @@ public class Client : MonoBehaviour
 
     private void UpdateMessagePump()
     {
-        DataStreamReader stream;
+        DataStreamReader streamReader;
         NetworkEvent.Type cmd;
 
-        while ((cmd = this.connection.PopEvent(this.driver, out stream)) != NetworkEvent.Type.Empty)
+        while ((cmd = this.connection.PopEvent(this.driver, out streamReader)) != NetworkEvent.Type.Empty)
         {
             switch (cmd)
             {
@@ -83,7 +83,7 @@ public class Client : MonoBehaviour
                     break;
 
                 case NetworkEvent.Type.Data:
-                    NetUtility.OnData(stream, default(NetworkConnection));
+                    NetUtility.OnData(streamReader, default(NetworkConnection));
                     break;
 
                 case NetworkEvent.Type.Disconnect:

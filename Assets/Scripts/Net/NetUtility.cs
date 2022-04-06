@@ -28,31 +28,31 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_MAKE_MOVE;
     public static Action<NetMessage, NetworkConnection> S_REMATCH;
 
-    public static void OnData(DataStreamReader stream, NetworkConnection cnn, Server server = null)
+    public static void OnData(DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
         NetMessage msg = null;
-        var OpCode = (OpCode)stream.ReadByte();
+        var OpCode = (OpCode)streamReader.ReadByte();
         switch (OpCode)
         {
             case OpCode.KEEP_ALIVE:
-                msg = new NetKeepAlive(stream);
+                msg = new NetKeepAlive(streamReader);
                 break;
 
             case OpCode.WELCOME:
-                msg = new NetWelcome(stream);
+                msg = new NetWelcome(streamReader);
                 break;
 
             case OpCode.START_GAME:
-                msg = new NetStartGame(stream);
+                msg = new NetStartGame(streamReader);
                 break;
 
             case OpCode.PIECE_SELECTED:
-                msg = new NetPieceSelected(stream);
+                msg = new NetPieceSelected(streamReader);
                 break;
 
-            // case OpCode.MAKE_MOVE:
-            //     msg = new NetMakeMove(stream);
-            //     break;
+            case OpCode.MAKE_MOVE:
+                msg = new NetMakeMove(streamReader);
+                break;
 
             // case OpCode.REMATCH:
             //     msg = new NetRematch(stream);
