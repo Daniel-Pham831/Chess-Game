@@ -56,7 +56,7 @@ public class ChessBoard : MonoBehaviour
     private ChessBoardInputEvent chessBoardInputEvent;
     public event Action<Team> onTurnSwitched;
     public event Action<Team> onTeamVictory;
-    public event Action onGameStart;
+    public event Action<int> onGameStart;
 
     // For singleton
     public static ChessBoard Singleton { get; private set; }
@@ -489,8 +489,8 @@ public class ChessBoard : MonoBehaviour
         Debug.Log($"My team is {this.currentTeam}");
     }
 
-    private void OnStartGameClient(NetMessage obj)
+    private void OnStartGameClient(NetMessage message)
     {
-        this.onGameStart?.Invoke();
+        this.onGameStart?.Invoke(this.currentTeam + 1);
     }
 }
