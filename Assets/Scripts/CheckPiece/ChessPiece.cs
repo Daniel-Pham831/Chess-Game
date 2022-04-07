@@ -51,9 +51,9 @@ public abstract class ChessPiece : MonoBehaviour
             ChessBoard.Singleton.ShowMovableOf(this.validMoveList, this.capturableMoveList);
     }
 
-    public void Select()
+    public void Select(Vector2Int selectedPosition)
     {
-        Server.Singleton.BroadCast(new NetPieceSelected(this.currentX, this.currentY));
+        Server.Singleton.BroadCast(new NetPieceSelected(selectedPosition.x, selectedPosition.y));
     }
 
     public void SelectClient()

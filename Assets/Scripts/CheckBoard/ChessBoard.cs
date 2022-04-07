@@ -217,9 +217,7 @@ public class ChessBoard : MonoBehaviour
         {
             // If currentSelectedPiece is selected
             if (this.currentSelectedPiece.IsNotNull)
-                this.currentSelectedPiece.Select();
-
-            this.currentSelectedPiece = this.nullPiece;
+                this.currentSelectedPiece.Select(-Vector2Int.one);
 
             return;
         }
@@ -258,13 +256,11 @@ public class ChessBoard : MonoBehaviour
             {
                 if (this.currentSelectedPiece.IsNotNull)
                 {
-                    this.currentSelectedPiece.Select();
-                    this.currentSelectedPiece = this.nullPiece;
+                    this.currentSelectedPiece.Select(-Vector2Int.one);
                 }
                 else
                 {
-                    this.currentSelectedPiece = this.chessPieces[this.currentHover.x, this.currentHover.y];
-                    this.currentSelectedPiece.Select();
+                    this.currentSelectedPiece.Select(this.currentHover);
                 }
             }
         }
@@ -278,7 +274,7 @@ public class ChessBoard : MonoBehaviour
     // For Handling chess piece movement of the chess board
     private void ReplaceHoverPieceWithCurrentSelectedPiece(KillConfirm killConfirm = KillConfirm.Move)
     {
-        this.currentSelectedPiece.SelectClient();
+        this.currentSelectedPiece.Select(-Vector2Int.one);
 
         ChessPiece tempChessPiece = this.currentSelectedPiece;
         ChessPiece deadPiece = killConfirm == KillConfirm.Kill ? this.chessPieces[this.currentHover.x, this.currentHover.y] : this.nullPiece;
@@ -509,8 +505,16 @@ public class ChessBoard : MonoBehaviour
     {
         NetPieceSelected netPieceSelected = message as NetPieceSelected;
 
-        this.currentSelectedPiece = this.chessPieces[netPieceSelected.currentX, netPieceSelected.currentY];
-        this.currentSelectedPiece.SelectClient();
+        if (this.currentSelectedPiece.IsNotNull)
+        {
+            this.currentSelectedPiece.SelectClient();
+            this.currentSelectedPiece = this.nullPiece;
+        }
+        else
+        {
+            this.currentSelectedPiece = this.chessPieces[netPieceSelected.currentX, netPieceSelected.currentY];
+            this.currentSelectedPiece.SelectClient();
+        }
     }
 
     private void OnMakeMoveClient(NetMessage message)
