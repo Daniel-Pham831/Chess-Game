@@ -217,7 +217,7 @@ public class ChessBoard : MonoBehaviour
         {
             // If currentSelectedPiece is selected
             if (this.currentSelectedPiece.IsNotNull)
-                this.currentSelectedPiece.Select(-Vector2Int.one);
+                this.currentSelectedPiece.SelectClient(-Vector2Int.one);
 
             return;
         }
@@ -256,11 +256,11 @@ public class ChessBoard : MonoBehaviour
             {
                 if (this.currentSelectedPiece.IsNotNull)
                 {
-                    this.currentSelectedPiece.Select(-Vector2Int.one);
+                    this.currentSelectedPiece.SelectClient(-Vector2Int.one);
                 }
                 else
                 {
-                    this.currentSelectedPiece.Select(this.currentHover);
+                    this.currentSelectedPiece.SelectClient(this.currentHover);
                 }
             }
         }
@@ -268,21 +268,18 @@ public class ChessBoard : MonoBehaviour
 
     private void SendMovePieceToServer(KillConfirm killConfirm = KillConfirm.Move)
     {
-        Server.Singleton.BroadCast(new NetMakeMove(this.currentHover.x, this.currentHover.y, killConfirm));
+        Client.Singleton.SendToServer(new NetMakeMove(this.currentHover.x, this.currentHover.y, killConfirm));
     }
 
     // For Handling chess piece movement of the chess board
     private void ReplaceHoverPieceWithCurrentSelectedPiece(KillConfirm killConfirm = KillConfirm.Move)
     {
-        this.currentSelectedPiece.Select(-Vector2Int.one);
-
         ChessPiece tempChessPiece = this.currentSelectedPiece;
         ChessPiece deadPiece = killConfirm == KillConfirm.Kill ? this.chessPieces[this.currentHover.x, this.currentHover.y] : this.nullPiece;
 
         this.chessPieces[this.currentHover.x, this.currentHover.y] = this.currentSelectedPiece;
         this.chessPieces[tempChessPiece.currentX, tempChessPiece.currentY] = this.nullPiece;
 
-        this.currentSelectedPiece = this.nullPiece;
 
         this.chessPieces[this.currentHover.x, this.currentHover.y].MoveTo(this.currentHover);
 
@@ -445,6 +442,9 @@ public class ChessBoard : MonoBehaviour
         {
             this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
             NetUtility.S_WELCOME += this.OnWelcomeServer;
+            NetUtility.S_PIECE_SELECTED += this.OnPieceSelectedServer;
+            NetUtility.S_MAKE_MOVE += this.OnMakeMoveServer;
+
             NetUtility.C_WELCOME += this.OnWelcomeClient;
             NetUtility.C_START_GAME += this.OnStartGameClient;
             NetUtility.C_PIECE_SELECTED += this.OnPieceSelectedClient;
@@ -454,16 +454,15 @@ public class ChessBoard : MonoBehaviour
         {
             this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
             NetUtility.S_WELCOME -= this.OnWelcomeServer;
+            NetUtility.S_PIECE_SELECTED -= this.OnPieceSelectedServer;
+            NetUtility.S_MAKE_MOVE -= this.OnMakeMoveServer;
+
             NetUtility.C_WELCOME -= this.OnWelcomeClient;
             NetUtility.C_START_GAME -= this.OnStartGameClient;
             NetUtility.C_PIECE_SELECTED -= this.OnPieceSelectedClient;
             NetUtility.C_MAKE_MOVE -= this.OnMakeMoveClient;
         }
     }
-
-
-
-
 
     // Server
     private void OnWelcomeServer(NetMessage message, NetworkConnection connectedClient)
@@ -484,6 +483,21 @@ public class ChessBoard : MonoBehaviour
     {
         return currentTotalUser == 0 ? Team.Blue : Team.Red;
     }
+
+    private void OnPieceSelectedServer(NetMessage netMessage, NetworkConnection sender)
+    {
+        NetPieceSelected netPieceSelected = netMessage as NetPieceSelected;
+
+        Server.Singleton.BroadCast(netPieceSelected);
+    }
+
+    private void OnMakeMoveServer(NetMessage netMessage, NetworkConnection sender)
+    {
+        NetMakeMove netMakeMove = netMessage as NetMakeMove;
+
+        Server.Singleton.BroadCast(netMakeMove);
+    }
+
 
     //Client
     private void OnWelcomeClient(NetMessage message)
@@ -507,13 +521,13 @@ public class ChessBoard : MonoBehaviour
 
         if (this.currentSelectedPiece.IsNotNull)
         {
-            this.currentSelectedPiece.SelectClient();
+            this.currentSelectedPiece.SetPieceSelect();
             this.currentSelectedPiece = this.nullPiece;
         }
         else
         {
             this.currentSelectedPiece = this.chessPieces[netPieceSelected.currentX, netPieceSelected.currentY];
-            this.currentSelectedPiece.SelectClient();
+            this.currentSelectedPiece.SetPieceSelect();
         }
     }
 
@@ -525,5 +539,8 @@ public class ChessBoard : MonoBehaviour
         this.currentHover.y = netMakeMove.NextY;
 
         this.ReplaceHoverPieceWithCurrentSelectedPiece(netMakeMove.killConfirm);
+
+        this.currentSelectedPiece.SetPieceSelect();
+        this.currentSelectedPiece = this.nullPiece;
     }
 }
