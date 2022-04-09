@@ -28,10 +28,12 @@ public class CamController : MonoBehaviour
         if (confirm)
         {
             ChessBoard.Singleton.onGameStart += onGameStart;
+            NetUtility.C_VICTORY_CLAIM += onVictoryClaimClient;
         }
         else
         {
             ChessBoard.Singleton.onGameStart -= onGameStart;
+            NetUtility.C_VICTORY_CLAIM -= onVictoryClaimClient;
         }
     }
 
@@ -43,5 +45,15 @@ public class CamController : MonoBehaviour
         }
 
         cameras[(int)team + 1].SetActive(true);
+    }
+
+    private void onVictoryClaimClient(NetMessage obj)
+    {
+        foreach (GameObject camera in cameras)
+        {
+            camera.SetActive(false);
+        }
+
+        cameras[0].SetActive(true);
     }
 }
