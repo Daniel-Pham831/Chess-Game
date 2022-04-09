@@ -130,12 +130,16 @@ public class UIManager : MonoBehaviour
         if (resetConfirm)
         {
             Client.Singleton.SendToServer(new NetRematch());
-            this.toggles[(int)netReady.ReadyTeam].isOn = false;
         }
     }
 
     private void onNetRematchClient(NetMessage netMessage)
     {
         GameStateManager.Singleton.UpdateGameState(GameState.Reset, null);
+        foreach (Toggle toggle in this.toggles)
+        {
+            toggle.isOn = false;
+        }
+        InputEventManager.Singleton.onSpacePressDown -= OnSpaceButtonPressDown;
     }
 }
