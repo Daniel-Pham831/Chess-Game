@@ -94,6 +94,7 @@ public abstract class ChessPiece : MonoBehaviour
 
     public void UpdateValidMoveList()
     {
+        this.clearMoveLists();
         this.validMoveList = this.GetAllPossibleMove();
 
         ChessPiece[,] chessPieces = ChessBoard.Singleton.chessPieces;
@@ -101,6 +102,12 @@ public abstract class ChessPiece : MonoBehaviour
         {
             chessPieces[validMove.x, validMove.y].SetIsBeingAttacked(this.team, true);
         }
+    }
+
+    private void clearMoveLists()
+    {
+        this.validMoveList.Clear();
+        this.capturableMoveList.Clear();
     }
 
     protected abstract List<Vector2Int> GetAllPossibleMove();

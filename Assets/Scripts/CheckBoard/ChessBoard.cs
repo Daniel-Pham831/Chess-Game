@@ -266,10 +266,6 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
-    private void SendMovePieceToServer(KillConfirm killConfirm = KillConfirm.Move)
-    {
-        Client.Singleton.SendToServer(new NetMakeMove(this.currentHover.x, this.currentHover.y, killConfirm));
-    }
 
     // For Handling chess piece movement of the chess board
     private void ReplaceHoverPieceWithCurrentSelectedPiece(KillConfirm killConfirm = KillConfirm.Move)
@@ -464,6 +460,16 @@ public class ChessBoard : MonoBehaviour
         }
     }
 
+    #region NetworkSendingMessage
+
+    private void SendMovePieceToServer(KillConfirm killConfirm = KillConfirm.Move)
+    {
+        Client.Singleton.SendToServer(new NetMakeMove(this.currentHover.x, this.currentHover.y, killConfirm));
+    }
+
+    #endregion
+
+    #region Network Received Message
     // Server
     private void OnWelcomeServer(NetMessage message, NetworkConnection connectedClient)
     {
@@ -497,7 +503,6 @@ public class ChessBoard : MonoBehaviour
 
         Server.Singleton.BroadCast(netMakeMove);
     }
-
 
     //Client
     private void OnWelcomeClient(NetMessage message)
@@ -543,4 +548,7 @@ public class ChessBoard : MonoBehaviour
         this.currentSelectedPiece.SetPieceSelect();
         this.currentSelectedPiece = this.nullPiece;
     }
+
+    #endregion
+
 }

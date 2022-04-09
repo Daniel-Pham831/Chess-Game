@@ -26,6 +26,7 @@ public class Pawn : ChessPiece
     protected override List<Vector2Int> GetAllPossibleMove()
     {
         List<Vector2Int> allPossibleMoveList = new List<Vector2Int>();
+
         int teamForward = this.team == Team.Blue ? 1 : -1;
 
         Vector2Int forward1, forward2, forwardLeft, forwardRight;
