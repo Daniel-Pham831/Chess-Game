@@ -40,7 +40,7 @@ public class CamController : MonoBehaviour
 
     private void onNetRematchClient(NetMessage netMessage)
     {
-        this.onGameStart((netMessage as NetRematch).RematchTeam);
+        this.onGameStart(ChessBoard.Singleton.playerTeam);
     }
 
     private void onGameStart(Team team)

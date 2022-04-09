@@ -114,7 +114,9 @@ public class UIManager : MonoBehaviour
 
         if (resetConfirm)
         {
-            Server.Singleton.BroadCast(new NetRematch(ChessBoard.Singleton.playerTeam));
+            // Tạo 1 cái switchTeam message
+
+            Server.Singleton.BroadCast(new NetRematch());
         }
     }
 

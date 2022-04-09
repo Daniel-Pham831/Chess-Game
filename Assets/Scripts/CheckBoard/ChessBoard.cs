@@ -35,11 +35,10 @@ public class ChessBoard : MonoBehaviour
 
     // Player Turn
     public Team currentTurn;
-    public Team playerTeam;
 
     // Multi logics
     private int playerCount = -1;
-    private Team currentTeam;
+    public Team playerTeam;
 
     // For generateAllTiles
     private float tileSize;
@@ -68,7 +67,6 @@ public class ChessBoard : MonoBehaviour
         registerEvents(true);
 
         this.currentTurn = Team.Blue;
-        this.playerTeam = Team.Blue;
 
         this.nullPiece = this.SpawnNullPiece();
         this.currentSelectedPiece = this.nullPiece;
@@ -211,7 +209,7 @@ public class ChessBoard : MonoBehaviour
     private void OnLeftMouseButtonDown()
     {
         // If this is not our turn
-        if (this.currentTurn != this.currentTeam) return;
+        if (this.currentTurn != this.playerTeam) return;
 
         // If the select outside of the board
         if (this.currentHover == -Vector2Int.one)
@@ -237,7 +235,7 @@ public class ChessBoard : MonoBehaviour
         else
         {
             // If chessPiece at currentHover is not our team piece
-            if (this.chessPieces[this.currentHover.x, this.currentHover.y].team != this.currentTeam)
+            if (this.chessPieces[this.currentHover.x, this.currentHover.y].team != this.playerTeam)
             {
                 if (this.currentSelectedPiece.IsNull) return;
 
@@ -450,6 +448,7 @@ public class ChessBoard : MonoBehaviour
             NetUtility.C_PIECE_SELECTED += this.OnPieceSelectedClient;
             NetUtility.C_MAKE_MOVE += this.OnMakeMoveClient;
             NetUtility.C_VICTORY_CLAIM += this.OnVictoryClaimClient;
+            NetUtility.C_REMATCH -= onNetRematchClient;
         }
         else
         {
@@ -466,8 +465,10 @@ public class ChessBoard : MonoBehaviour
             NetUtility.C_PIECE_SELECTED -= this.OnPieceSelectedClient;
             NetUtility.C_MAKE_MOVE -= this.OnMakeMoveClient;
             NetUtility.C_VICTORY_CLAIM -= this.OnVictoryClaimClient;
+            NetUtility.C_REMATCH -= onNetRematchClient;
         }
     }
+
 
 
 
@@ -529,15 +530,14 @@ public class ChessBoard : MonoBehaviour
     {
         NetWelcome netWelcome = message as NetWelcome;
 
-        this.currentTeam = netWelcome.AssignedTeam;
-        this.playerTeam = this.currentTeam;
+        this.playerTeam = netWelcome.AssignedTeam;
 
-        Debug.Log($"My team is {this.currentTeam}");
+        Debug.Log($"My team is {this.playerTeam}");
     }
 
     private void OnStartGameClient(NetMessage message)
     {
-        this.onGameStart?.Invoke(this.currentTeam);
+        this.onGameStart?.Invoke(this.playerTeam);
     }
 
     private void OnPieceSelectedClient(NetMessage message)
@@ -575,6 +575,13 @@ public class ChessBoard : MonoBehaviour
 
         GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)netVictoryClaim.VictoryTeam);
     }
+
+    private void onNetRematchClient(NetMessage netMessage)
+    {
+        this.currentTurn = Team.Blue;
+        this.playerTeam = this.playerTeam == Team.Blue ? Team.Red : Team.Blue;
+    }
+
 
     #endregion
 }
