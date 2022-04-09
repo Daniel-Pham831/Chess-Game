@@ -243,7 +243,7 @@ public class ChessBoard : MonoBehaviour
                 if (this.CanCurrentSelectedPieceMoveHere(this.currentHover))
                 {
                     if (this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType == ChessPieceType.King)
-                        GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)this.currentTeam);
+                        Client.Singleton.SendToServer(new NetVictoryClaim(this.currentTurn));
 
                     Debug.Log($"{this.currentSelectedPiece.pieceType.ToString()} killed {this.chessPieces[this.currentHover.x, this.currentHover.y].pieceType.ToString()}");
 
@@ -437,28 +437,39 @@ public class ChessBoard : MonoBehaviour
         if (confirm)
         {
             this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
+            //Server
             NetUtility.S_WELCOME += this.OnWelcomeServer;
             NetUtility.S_PIECE_SELECTED += this.OnPieceSelectedServer;
             NetUtility.S_MAKE_MOVE += this.OnMakeMoveServer;
+            NetUtility.S_VICTORY_CLAIM += this.OnVictoryClaimServer;
 
+            //Client
             NetUtility.C_WELCOME += this.OnWelcomeClient;
             NetUtility.C_START_GAME += this.OnStartGameClient;
             NetUtility.C_PIECE_SELECTED += this.OnPieceSelectedClient;
             NetUtility.C_MAKE_MOVE += this.OnMakeMoveClient;
+            NetUtility.C_VICTORY_CLAIM += this.OnVictoryClaimClient;
         }
         else
         {
             this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
+            //Server
             NetUtility.S_WELCOME -= this.OnWelcomeServer;
             NetUtility.S_PIECE_SELECTED -= this.OnPieceSelectedServer;
             NetUtility.S_MAKE_MOVE -= this.OnMakeMoveServer;
+            NetUtility.S_VICTORY_CLAIM -= this.OnVictoryClaimServer;
 
+            //Client
             NetUtility.C_WELCOME -= this.OnWelcomeClient;
             NetUtility.C_START_GAME -= this.OnStartGameClient;
             NetUtility.C_PIECE_SELECTED -= this.OnPieceSelectedClient;
             NetUtility.C_MAKE_MOVE -= this.OnMakeMoveClient;
+            NetUtility.C_VICTORY_CLAIM -= this.OnVictoryClaimClient;
         }
     }
+
+
+
 
     #region NetworkSendingMessage
 
@@ -504,6 +515,14 @@ public class ChessBoard : MonoBehaviour
         Server.Singleton.BroadCast(netMakeMove);
     }
 
+    private void OnVictoryClaimServer(NetMessage netMessage, NetworkConnection sender)
+    {
+        NetVictoryClaim netVictoryClaim = netMessage as NetVictoryClaim;
+
+        Server.Singleton.BroadCast(netVictoryClaim);
+    }
+
+
     //Client
     private void OnWelcomeClient(NetMessage message)
     {
@@ -547,6 +566,13 @@ public class ChessBoard : MonoBehaviour
 
         this.currentSelectedPiece.SetPieceSelect();
         this.currentSelectedPiece = this.nullPiece;
+    }
+
+    private void OnVictoryClaimClient(NetMessage netMessage)
+    {
+        NetVictoryClaim netVictoryClaim = netMessage as NetVictoryClaim;
+
+        GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)netVictoryClaim.VictoryTeam);
     }
 
     #endregion
