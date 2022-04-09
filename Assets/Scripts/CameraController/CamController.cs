@@ -38,9 +38,9 @@ public class CamController : MonoBehaviour
         }
     }
 
-    private void onNetRematchClient(NetMessage obj)
+    private void onNetRematchClient(NetMessage netMessage)
     {
-        throw new NotImplementedException();
+        this.onGameStart((netMessage as NetRematch).RematchTeam);
     }
 
     private void onGameStart(Team team)

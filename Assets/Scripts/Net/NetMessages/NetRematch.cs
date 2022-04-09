@@ -2,9 +2,11 @@ using Unity.Networking.Transport;
 
 public class NetRematch : NetMessage
 {
-    public NetRematch()
+    public Team RematchTeam { set; get; }
+    public NetRematch(Team rematchTeam)
     {
         this.Code = OpCode.REMATCH;
+        this.RematchTeam = rematchTeam;
     }
 
     public NetRematch(DataStreamReader reader)
@@ -17,11 +19,12 @@ public class NetRematch : NetMessage
     {
         base.Serialize(ref writer);
 
+        writer.WriteInt((int)this.RematchTeam);
     }
 
     public override void Deserialize(DataStreamReader reader)
     {
-
+        this.RematchTeam = (Team)reader.ReadInt();
     }
 
     public override void ReceivedOnClient()
