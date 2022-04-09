@@ -489,7 +489,7 @@ public class ChessBoard : MonoBehaviour
         // We need to assign a team and return the message back to that client
         NetWelcome netWelcome = message as NetWelcome;
 
-        netWelcome.AssignedTeam = AssignTeamToClient(++this.playerCount);
+        netWelcome.AssignedTeam = this.AssignTeamToClient(++this.playerCount);
 
         Server.Singleton.SendToClient(connectedClient, netWelcome);
 

@@ -41,6 +41,7 @@ public class Server : MonoBehaviour
         this.connections = new NativeList<NetworkConnection>(2, Allocator.Persistent);
         this.isActive = true;
     }
+
     public void Shutdown()
     {
         if (this.isActive)
@@ -50,6 +51,7 @@ public class Server : MonoBehaviour
             this.isActive = false;
         }
     }
+
     public void OnDestroy()
     {
         this.Shutdown();
@@ -88,6 +90,7 @@ public class Server : MonoBehaviour
             }
         }
     }
+
     private void AcceptNewConnections()
     {
         NetworkConnection c;
@@ -96,6 +99,7 @@ public class Server : MonoBehaviour
             this.connections.Add(c);
         }
     }
+
     private void UpdateMessagePump()
     {
         DataStreamReader streamReader;
@@ -134,6 +138,7 @@ public class Server : MonoBehaviour
         msg.Serialize(ref writer);
         this.driver.EndSend(writer);
     }
+
     public void BroadCast(NetMessage msg)
     {
         for (int i = 0; i < this.connections.Length; i++)

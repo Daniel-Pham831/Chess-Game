@@ -8,6 +8,7 @@ using UnityEngine;
 public class Client : MonoBehaviour
 {
     public static Client Singleton { get; private set; }
+
     private void Awake()
     {
         Singleton = this;
@@ -34,6 +35,7 @@ public class Client : MonoBehaviour
 
         this.RegisterToEvent();
     }
+
     public void Shutdown()
     {
         if (this.isActive)
@@ -44,6 +46,7 @@ public class Client : MonoBehaviour
             connection = default(NetworkConnection);
         }
     }
+
     public void OnDestroy()
     {
         this.Shutdown();
@@ -104,18 +107,22 @@ public class Client : MonoBehaviour
         this.driver.EndSend(writer);
     }
 
-    // Event parsing
+    #region Network Received
     private void RegisterToEvent()
     {
         NetUtility.C_KEEP_ALIVE += this.OnKeepAlive;
     }
+
     private void UnregisterToEvent()
     {
         NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
     }
+
     private void OnKeepAlive(NetMessage keepAliveMessage)
     {
         // Send it back, to keep both side alive
         this.SendToServer(keepAliveMessage);
     }
+    #endregion
+
 }
