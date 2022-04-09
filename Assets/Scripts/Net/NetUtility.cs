@@ -10,7 +10,8 @@ public enum OpCode
     PIECE_SELECTED = 4,
     MAKE_MOVE = 5,
     VICTORY_CLAIM = 6,
-    REMATCH = 7
+    READY = 7,
+    REMATCH = 8
 }
 
 public static class NetUtility
@@ -22,6 +23,7 @@ public static class NetUtility
     public static Action<NetMessage> C_PIECE_SELECTED;
     public static Action<NetMessage> C_MAKE_MOVE;
     public static Action<NetMessage> C_VICTORY_CLAIM;
+    public static Action<NetMessage> C_READY;
     public static Action<NetMessage> C_REMATCH;
     public static Action<NetMessage, NetworkConnection> S_KEEP_ALIVE;
     public static Action<NetMessage, NetworkConnection> S_WELCOME;
@@ -29,6 +31,7 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_PIECE_SELECTED;
     public static Action<NetMessage, NetworkConnection> S_MAKE_MOVE;
     public static Action<NetMessage, NetworkConnection> S_VICTORY_CLAIM;
+    public static Action<NetMessage, NetworkConnection> S_READY;
     public static Action<NetMessage, NetworkConnection> S_REMATCH;
 
     public static void OnData(DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
@@ -59,6 +62,10 @@ public static class NetUtility
 
             case OpCode.VICTORY_CLAIM:
                 msg = new NetVictoryClaim(streamReader);
+                break;
+
+            case OpCode.READY:
+                msg = new NetReady(streamReader);
                 break;
 
             // case OpCode.REMATCH:

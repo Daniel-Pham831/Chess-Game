@@ -9,8 +9,7 @@ public class CamController : MonoBehaviour
     [SerializeField] private GameObject[] cameras;
     private void Awake()
     {
-        if (Singleton != null)
-            Singleton = this;
+        Singleton = this;
     }
 
     private void Start()

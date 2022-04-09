@@ -16,7 +16,7 @@ public class NetKeepAlive : NetMessage
 
     public override void Serialize(ref DataStreamWriter writer)
     {
-        writer.WriteByte((byte)this.Code);
+        base.Serialize(ref writer);
     }
 
     public override void Deserialize(DataStreamReader reader)

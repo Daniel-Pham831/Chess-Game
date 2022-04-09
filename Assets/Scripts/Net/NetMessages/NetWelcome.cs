@@ -16,7 +16,8 @@ public class NetWelcome : NetMessage
 
     public override void Serialize(ref DataStreamWriter writer)
     {
-        writer.WriteByte((byte)this.Code);
+        base.Serialize(ref writer);
+
         writer.WriteInt((int)this.AssignedTeam);
     }
 

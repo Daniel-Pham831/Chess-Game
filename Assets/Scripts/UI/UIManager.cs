@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Networking.Transport;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -9,25 +10,24 @@ public class UIManager : MonoBehaviour
     public static UIManager Singleton { get; private set; }
     [SerializeField] private Image currentTurnUI;
     [SerializeField] private GameObject endGameCanvasUI;
+    [SerializeField] private Toggle[] toggles;
+    [SerializeField] private Button resetButton;
     [SerializeField] private Material blueTeamMaterial;
     [SerializeField] private Material redTeamMaterial;
 
     private void Awake()
     {
-        if (Singleton != null)
-            Singleton = this;
+        Singleton = this;
     }
 
     private void Start()
     {
-        ChessBoard.Singleton.onTurnSwitched += OnTurnSwitched;
-        GameStateManager.Singleton.OnGameStateChanged += OnGameStateChanged;
+        this.registerEvents(true);
     }
 
     private void OnDestroy()
     {
-        ChessBoard.Singleton.onTurnSwitched -= OnTurnSwitched;
-        GameStateManager.Singleton.OnGameStateChanged -= OnGameStateChanged;
+        this.registerEvents(false);
     }
 
     private void OnTurnSwitched(Team turn)
@@ -51,6 +51,8 @@ public class UIManager : MonoBehaviour
 
     private void OnGameVictoryState(Turn turn)
     {
+        InputEventManager.Singleton.onSpacePressDown += OnSpaceButtonPressDown;
+
         this.endGameCanvasUI.SetActive(true);
         this.endGameCanvasUI.transform.GetChild((int)turn)?.gameObject.SetActive(true);
     }
@@ -62,8 +64,52 @@ public class UIManager : MonoBehaviour
         this.endGameCanvasUI.SetActive(false);
     }
 
-    public void OnResetButton()
+    public void OnSpaceButtonPressDown()
     {
-        GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
+        Debug.Log("Press");
+
+        Client.Singleton.SendToServer(new NetReady(ChessBoard.Singleton.playerTeam));
+        //GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
     }
+
+    private void registerEvents(bool confirm)
+    {
+        if (confirm)
+        {
+            ChessBoard.Singleton.onTurnSwitched += OnTurnSwitched;
+            GameStateManager.Singleton.OnGameStateChanged += OnGameStateChanged;
+
+            NetUtility.S_READY += onNetReadyServer;
+
+            NetUtility.C_READY += onNetReadyClient;
+        }
+        else
+        {
+            ChessBoard.Singleton.onTurnSwitched -= OnTurnSwitched;
+            GameStateManager.Singleton.OnGameStateChanged -= OnGameStateChanged;
+
+            NetUtility.S_READY -= onNetReadyServer;
+
+            NetUtility.C_READY += onNetReadyClient;
+
+            InputEventManager.Singleton.onSpacePressDown -= OnSpaceButtonPressDown;
+        }
+    }
+
+    // Server
+    private void onNetReadyServer(NetMessage netMessage, NetworkConnection sender)
+    {
+        NetReady netReady = netMessage as NetReady;
+
+        Server.Singleton.BroadCast(netReady);
+    }
+
+    // Client
+    private void onNetReadyClient(NetMessage netMessage)
+    {
+        NetReady netReady = netMessage as NetReady;
+
+        toggles[(int)netReady.ReadyTeam].isOn = !toggles[(int)netReady.ReadyTeam].isOn;
+    }
+
 }

@@ -52,7 +52,6 @@ public class ChessBoard : MonoBehaviour
     private Vector3 bounds;
 
     // For events
-    private ChessBoardInputEvent chessBoardInputEvent;
     public event Action<Team> onTurnSwitched;
     public event Action<Team> onTeamVictory;
     public event Action<Team> onGameStart;
@@ -66,7 +65,6 @@ public class ChessBoard : MonoBehaviour
     {
         this.SetupSingleton();
 
-        this.chessBoardInputEvent = GetComponent<ChessBoardInputEvent>();
         registerEvents(true);
 
         this.currentTurn = Team.Blue;
@@ -96,10 +94,13 @@ public class ChessBoard : MonoBehaviour
         this.deadList.SetupDeadList(GetTileCenter(new Vector2Int(8, -1)), this.GetTileCenter(new Vector2Int(-1, 8)), this.tileSize, transform.forward);
 
         GameStateManager.Singleton.OnGameStateChanged += this.OnGameStateChanged;
+        InputEventManager.Singleton.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
     }
     private void OnDestroy()
     {
         GameStateManager.Singleton.OnGameStateChanged -= this.OnGameStateChanged;
+        InputEventManager.Singleton.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
+
         this.registerEvents(false);
     }
     private void Update()
@@ -436,7 +437,7 @@ public class ChessBoard : MonoBehaviour
     {
         if (confirm)
         {
-            this.chessBoardInputEvent.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
+            //   InputEventManager.Singleton.onLeftMouseButtonDown += this.OnLeftMouseButtonDown;
             //Server
             NetUtility.S_WELCOME += this.OnWelcomeServer;
             NetUtility.S_PIECE_SELECTED += this.OnPieceSelectedServer;
@@ -452,7 +453,7 @@ public class ChessBoard : MonoBehaviour
         }
         else
         {
-            this.chessBoardInputEvent.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
+            //   InputEventManager.Singleton.onLeftMouseButtonDown -= this.OnLeftMouseButtonDown;
             //Server
             NetUtility.S_WELCOME -= this.OnWelcomeServer;
             NetUtility.S_PIECE_SELECTED -= this.OnPieceSelectedServer;
@@ -576,5 +577,4 @@ public class ChessBoard : MonoBehaviour
     }
 
     #endregion
-
 }

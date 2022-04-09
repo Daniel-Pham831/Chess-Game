@@ -16,8 +16,7 @@ public class MenuUIManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Singleton != null)
-            Singleton = this;
+        Singleton = this;
 
         this.registerEvents(true);
     }
