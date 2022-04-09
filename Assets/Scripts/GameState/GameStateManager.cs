@@ -43,10 +43,12 @@ public class GameStateManager : MonoBehaviour
         this.OnSwitchTurn?.Invoke(this.currentTurn);
     }
 
-    public void UpdateGameState(GameState nextState, Turn turn)
+    public void UpdateGameState(GameState nextState, Turn? turn)
     {
         this.currentState = nextState;
-        this.UpdateCurrentTurn(turn);
+
+        if (turn != null)
+            this.UpdateCurrentTurn((Turn)turn);
 
         switch (this.currentState)
         {

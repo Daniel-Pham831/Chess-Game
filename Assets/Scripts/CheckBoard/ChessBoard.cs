@@ -448,7 +448,7 @@ public class ChessBoard : MonoBehaviour
             NetUtility.C_PIECE_SELECTED += this.OnPieceSelectedClient;
             NetUtility.C_MAKE_MOVE += this.OnMakeMoveClient;
             NetUtility.C_VICTORY_CLAIM += this.OnVictoryClaimClient;
-            NetUtility.C_REMATCH -= onNetRematchClient;
+            NetUtility.C_SWITCH_TEAM += onNetSwitchTeamClient;
         }
         else
         {
@@ -465,7 +465,7 @@ public class ChessBoard : MonoBehaviour
             NetUtility.C_PIECE_SELECTED -= this.OnPieceSelectedClient;
             NetUtility.C_MAKE_MOVE -= this.OnMakeMoveClient;
             NetUtility.C_VICTORY_CLAIM -= this.OnVictoryClaimClient;
-            NetUtility.C_REMATCH -= onNetRematchClient;
+            NetUtility.C_SWITCH_TEAM -= onNetSwitchTeamClient;
         }
     }
 
@@ -576,12 +576,10 @@ public class ChessBoard : MonoBehaviour
         GameStateManager.Singleton.UpdateGameState(GameState.Victory, (Turn)netVictoryClaim.VictoryTeam);
     }
 
-    private void onNetRematchClient(NetMessage netMessage)
+    private void onNetSwitchTeamClient(NetMessage netMessage)
     {
         this.currentTurn = Team.Blue;
         this.playerTeam = this.playerTeam == Team.Blue ? Team.Red : Team.Blue;
     }
-
-
     #endregion
 }

@@ -69,7 +69,6 @@ public class UIManager : MonoBehaviour
         Debug.Log("Press");
 
         Client.Singleton.SendToServer(new NetReady(ChessBoard.Singleton.playerTeam));
-
     }
 
     private void registerEvents(bool confirm)
@@ -105,25 +104,13 @@ public class UIManager : MonoBehaviour
         NetReady netReady = netMessage as NetReady;
 
         Server.Singleton.BroadCast(netReady);
-
-        bool resetConfirm = true;
-        foreach (Toggle toggle in this.toggles)
-        {
-            if (!toggle.isOn) resetConfirm = false;
-        }
-
-        if (resetConfirm)
-        {
-            // Tạo 1 cái switchTeam message
-
-            Server.Singleton.BroadCast(new NetRematch());
-        }
     }
 
     private void onNetRematchServer(NetMessage netMessage, NetworkConnection sender)
     {
         NetRematch netRematch = netMessage as NetRematch;
 
+        Server.Singleton.SendToClient(sender, new NetSwitchTeam());
         Server.Singleton.BroadCast(netRematch);
     }
 
@@ -133,10 +120,22 @@ public class UIManager : MonoBehaviour
         NetReady netReady = netMessage as NetReady;
 
         this.toggles[(int)netReady.ReadyTeam].isOn = !this.toggles[(int)netReady.ReadyTeam].isOn;
+
+        bool resetConfirm = true;
+        foreach (Toggle toggle in this.toggles)
+        {
+            if (!toggle.isOn) resetConfirm = false;
+        }
+
+        if (resetConfirm)
+        {
+            Client.Singleton.SendToServer(new NetRematch());
+            this.toggles[(int)netReady.ReadyTeam].isOn = false;
+        }
     }
 
     private void onNetRematchClient(NetMessage netMessage)
     {
-        GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
+        GameStateManager.Singleton.UpdateGameState(GameState.Reset, null);
     }
 }
