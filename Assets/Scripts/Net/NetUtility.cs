@@ -68,9 +68,9 @@ public static class NetUtility
                 msg = new NetReady(streamReader);
                 break;
 
-            // case OpCode.REMATCH:
-            //     msg = new NetRematch(stream);
-            //     break;
+            case OpCode.REMATCH:
+                msg = new NetRematch(streamReader);
+                break;
 
             default:
                 Debug.LogError("Message received has no OpCode");

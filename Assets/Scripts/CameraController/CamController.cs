@@ -28,12 +28,19 @@ public class CamController : MonoBehaviour
         {
             ChessBoard.Singleton.onGameStart += onGameStart;
             NetUtility.C_VICTORY_CLAIM += onVictoryClaimClient;
+            NetUtility.C_REMATCH += onNetRematchClient;
         }
         else
         {
             ChessBoard.Singleton.onGameStart -= onGameStart;
             NetUtility.C_VICTORY_CLAIM -= onVictoryClaimClient;
+            NetUtility.C_REMATCH -= onNetRematchClient;
         }
+    }
+
+    private void onNetRematchClient(NetMessage obj)
+    {
+        throw new NotImplementedException();
     }
 
     private void onGameStart(Team team)

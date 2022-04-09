@@ -80,19 +80,22 @@ public class UIManager : MonoBehaviour
             GameStateManager.Singleton.OnGameStateChanged += OnGameStateChanged;
 
             NetUtility.S_READY += onNetReadyServer;
+            NetUtility.S_REMATCH += onNetRematchServer;
 
             NetUtility.C_READY += onNetReadyClient;
+            NetUtility.C_REMATCH += onNetRematchClient;
         }
         else
         {
             ChessBoard.Singleton.onTurnSwitched -= OnTurnSwitched;
             GameStateManager.Singleton.OnGameStateChanged -= OnGameStateChanged;
+            InputEventManager.Singleton.onSpacePressDown -= OnSpaceButtonPressDown;
 
             NetUtility.S_READY -= onNetReadyServer;
+            NetUtility.S_REMATCH -= onNetRematchServer;
 
-            NetUtility.C_READY += onNetReadyClient;
-
-            InputEventManager.Singleton.onSpacePressDown -= OnSpaceButtonPressDown;
+            NetUtility.C_READY -= onNetReadyClient;
+            NetUtility.C_REMATCH -= onNetRematchClient;
         }
     }
 
@@ -102,14 +105,6 @@ public class UIManager : MonoBehaviour
         NetReady netReady = netMessage as NetReady;
 
         Server.Singleton.BroadCast(netReady);
-    }
-
-    // Client
-    private void onNetReadyClient(NetMessage netMessage)
-    {
-        NetReady netReady = netMessage as NetReady;
-
-        this.toggles[(int)netReady.ReadyTeam].isOn = !this.toggles[(int)netReady.ReadyTeam].isOn;
 
         bool resetConfirm = true;
         foreach (Toggle toggle in this.toggles)
@@ -118,7 +113,28 @@ public class UIManager : MonoBehaviour
         }
 
         if (resetConfirm)
-            GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
+        {
+            Server.Singleton.BroadCast(new NetRematch());
+        }
     }
 
+    private void onNetRematchServer(NetMessage netMessage, NetworkConnection sender)
+    {
+        NetRematch netRematch = netMessage as NetRematch;
+
+        Server.Singleton.BroadCast(netRematch);
+    }
+
+    // Client
+    private void onNetReadyClient(NetMessage netMessage)
+    {
+        NetReady netReady = netMessage as NetReady;
+
+        this.toggles[(int)netReady.ReadyTeam].isOn = !this.toggles[(int)netReady.ReadyTeam].isOn;
+    }
+
+    private void onNetRematchClient(NetMessage netMessage)
+    {
+        GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
+    }
 }
