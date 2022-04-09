@@ -69,7 +69,7 @@ public class UIManager : MonoBehaviour
         Debug.Log("Press");
 
         Client.Singleton.SendToServer(new NetReady(ChessBoard.Singleton.playerTeam));
-        //GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
+
     }
 
     private void registerEvents(bool confirm)
@@ -109,7 +109,16 @@ public class UIManager : MonoBehaviour
     {
         NetReady netReady = netMessage as NetReady;
 
-        toggles[(int)netReady.ReadyTeam].isOn = !toggles[(int)netReady.ReadyTeam].isOn;
+        this.toggles[(int)netReady.ReadyTeam].isOn = !this.toggles[(int)netReady.ReadyTeam].isOn;
+
+        bool resetConfirm = true;
+        foreach (Toggle toggle in this.toggles)
+        {
+            if (!toggle.isOn) resetConfirm = false;
+        }
+
+        if (resetConfirm)
+            GameStateManager.Singleton.UpdateGameState(GameState.Reset, Turn.Player);
     }
 
 }

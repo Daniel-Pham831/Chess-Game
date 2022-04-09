@@ -470,7 +470,7 @@ MonoBehaviour:
     ModeOverride: 0
     LensShift: {x: 0, y: 0}
     GateFit: 2
-    m_SensorSize: {x: 1.77666, y: 1}
+    m_SensorSize: {x: 1.7741935, y: 1}
   m_Transitions:
     m_BlendHint: 0
     m_InheritPosition: 0
@@ -672,7 +672,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &230563406
 GameObject:
   m_ObjectHideFlags: 0
@@ -3785,7 +3785,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 400, y: -255.14157}
+  m_AnchoredPosition: {x: 400, y: -255.45454}
   m_SizeDelta: {x: 167.9192, y: 75.8602}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1374165930
@@ -3849,7 +3849,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 400.00003, y: -187.21147}
+  m_AnchoredPosition: {x: 400.00003, y: -187.52444}
   m_SizeDelta: {x: 789.794, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1387285936
@@ -4609,7 +4609,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_IsOn: 1
+  m_IsOn: 0
 --- !u!1 &1772210039
 GameObject:
   m_ObjectHideFlags: 0
