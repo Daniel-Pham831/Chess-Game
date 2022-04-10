@@ -3,7 +3,7 @@ A 3D chess-game made in unity
 
 Project was made in Unity 2021.2.11f1
 
-Added Multiplayer for the game (☞ﾟヮﾟ)☞
+Play with friends mode has been added to the game (☞ﾟヮﾟ)☞
 
 Please enjoy ༼ つ ◕_◕ ༽つ
 
